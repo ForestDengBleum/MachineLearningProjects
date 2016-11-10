@@ -1,0 +1,21 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov 10 10:44:45 2016
+
+@author: forest.deng
+"""
+
+import PyPDF2 as lib_pdf
+import docx as lib_word
+
+def get_pdftext(fileName):
+    pdfFile = open(fileName,'rb')
+    pdfReader = lib_pdf.PdfFileReader(pdfFile)
+    pageNo = pdfReader.numPages -1
+    items =['']
+    for i in range(pageNo):
+        pageObj = pdfReader.getPage(i)
+        items.append(pageObj.extractText())
+    yield ''.join(items)    
+
+def get_
