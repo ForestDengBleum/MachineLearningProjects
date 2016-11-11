@@ -38,7 +38,7 @@ def get_wordtext(fileName):
     items = []
     for para in doc.paragraphs:
         items.append(para.text)
-    doc.close()
+    #doc.close()
     return ''.join(items)
 
 def get_htmltext(fileName):

@@ -8,6 +8,8 @@ Created on Thu Nov 10 15:35:56 2016
 # -*- coding: utf-8-*-
 import re
 import string
+import numpy as np
+import Utility_TextClearance as utc
 
 def filter_tags(htmlstr):
     #先过滤CDATA
@@ -17,11 +19,11 @@ def filter_tags(htmlstr):
     re_br=re.compile('<br\s*?/?>')#
     re_h=re.compile('</?\w+[^>]*>')#HTML tag
     re_comment=re.compile('<!--[^>]*-->')#HTML comments
-    s=re_cdata.sub('',htmlstr)
-    s=re_script.sub('',s)
-    s=re_style.sub('',s)
+    s=re_cdata.sub(' ',htmlstr)
+    s=re_script.sub(' ',s)
+    s=re_style.sub(' ',s)
     s=re_br.sub('\n',s)
-    s=re_h.sub('',s)
+    s=re_h.sub(' ',s)
     s=re_comment.sub('',s)
     
     blank_line=re.compile('\n+')
@@ -57,6 +59,18 @@ def repalce(s,re_exp,repl_string):
 if __name__=='__main__':
     s=file('D:\\new\\cc.html').read()
     news=filter_tags(s)
-    print string.split(re.sub(r'[\d+]',' ',re.sub(r'[^\w\s]',' ',news)),' ')
+    print utc.control_nopunctuation(news)
+#    rep = ' '*len(string.punctuation)
+#    news = news.translate(string.maketrans(string.punctuation,rep))
+#    news = re.sub(r'[\d+]','', news)
+#    print news
+#    excl = ''.join(['\n','\t','\r','\b','\v','\f'])
+#    repl = ''.join([' ',' ',' ',' ',' ',' '])
+#    news = re.sub(r'[\d+]',' ',re.sub(r'[^\w\s]',' ',news))
+#    print re.sub(r'^.{1,2}',' ',news)
+#    words = np.array(string.split(news.translate(string.maketrans(excl,repl)), ' '))
+#    words = words[words<>'']
+#    print re.sub(r'[a-zA-Z]{1,2}','',words)
     
+    #    print string.split(re.sub(r'[\d+]',' ',re.sub(r'[^\w\s]',' ',news)),' ')
     
