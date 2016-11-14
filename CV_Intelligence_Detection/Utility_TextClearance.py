@@ -12,6 +12,12 @@ import Utility_RemoveHtmlTags as rht
 from stop_words import get_stop_words
 from enchant.checker import SpellChecker
 
+#def sigmoid(num):
+#    """"
+#    """"
+        
+    
+
 def translate_non_alphanumerics(to_translate, translate_to='_'):
     not_letters_or_digits = u'!"#%\'()*+,-./:;<=>?@[\]^_`{|}~'
     translate_table = lib_str.maketrans(not_letters_or_digits,
@@ -96,10 +102,17 @@ def control_noerrorwords(textInput,jdlist):
     checker.set_text(textInput)
     for errorword in checker:
         words.append(errorword.word)
-    words = list(set(words))    
+    words = list(set(words))
     crosswords = set(words).difference(set(jdlist))
     count = len(crosswords)
     cvtext = textInput
+
+    pwordsfile = open('Utility_Mywords.txt','r')
+    pwords = set(list(lib_str.split(re.sub('\n',' ', pwordsfile.read()),' ')))
+    pwordsfile.close()
+    
+    crosswords = crosswords.difference(pwords)
+    
     if count == 0:
         for e in words:
             cvtext = re.sub('(\s+' + e + '\s)',' ', cvtext)
@@ -143,7 +156,7 @@ def datapurse_cv(cvtext, jdtext):
     """
     cvwords = datapurse_general(cvtext)
     jdlist = list(set(getstringlist(datapurse_general(jdtext))))
-    return getstringlist(control_noerrorwords(cvwords,jdlist))        
+    return getstringlist(control_noerrorwords(cvwords,jdlist)), getstringlist(jdtext)        
     
 
    

@@ -28,6 +28,7 @@ Created on Thu Nov 10 13:08:01 2016
 
 import Utility_Input2Text as uit
 import Utility_TextClearance as utc
+import Algrithm_CVJDSimilarity as ac
 
 cvtext = uit.get_text('d:\\data\\cv.docx')
 
@@ -39,13 +40,28 @@ jdtext = uit.get_text('d:\\data\\jd.docx')
 cvtext = utc.datapurse_general(cvtext)
 jdtext = utc.datapurse_general(jdtext)
 
-print 'cvtext: %s' %cvtext
-print 'jdtext: %s' %jdtext
-print ' '
+#print 'cvtext: %s' %cvtext
+#print 'jdtext: %s' %jdtext
+#print ' '
 
-pursedlist = utc.datapurse_cv(cvtext, jdtext)
+pursedlist, jdlist = utc.datapurse_cv(cvtext, jdtext)
 
-print pursedlist
+#dic = ac.list_counter(pursedlist)
 
+cvframe = ac.get_dataframewithper(pursedlist)
+jdframe = ac.get_dataframewithper(jdlist)
+
+similarity = ac.get_similarity(cvframe, jdframe)
+
+print similarity
+
+#docs = ' '.join(jdlist)
+
+#t = ac.text_tokenize([docs])
+#print t.transpose()
+
+#print pursedlist
+
+#print jdlist
 
 
