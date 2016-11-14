@@ -7,6 +7,7 @@ Created on Thu Nov 10 14:56:21 2016
 import re
 import numpy as np
 import string as lib_str
+#import stop_words as sw
 import Utility_RemoveHtmlTags as rht
 from stop_words import get_stop_words
 from enchant.checker import SpellChecker
@@ -37,23 +38,26 @@ def control_nohtmltags(textInput):
 def control_nonumber(textInput):
     """
     """
-    return re.sub(r'[\d+]','', textInput)
+    return re.sub(r'[\d+]',' ', textInput)
 
 def control_nopunctuation(textInput):
     """
     """
-    textInput = textInput.encode('ascii','replace')
+    textInput = textInput.encode('ascii','xmlcharrefreplace')
     
     filterPunc = list(lib_str.punctuation)
     filterPunc.remove('.')
     filterPunc.remove('#')
+    filterPunc.remove('/')
     filterStr = ''.join(filterPunc)
         
     
     rep = ' '*len(filterStr)
     strResult = textInput.translate(lib_str.maketrans(filterStr,rep))
-    strResult = re.sub(r'\.(?!([nN][eE][tT]))','', strResult)
-    strResult = re.sub(r'(?<![cC])#','', strResult)
+    strResult = re.sub(r'\.(?!([nN][eE][tT]))',' ', strResult)
+    strResult = re.sub(r'(?<![cC])#',' ', strResult)
+    strResult = re.sub(r'(\/(?![Ss]))|((?<![cCBb])\/)|\
+                        ((?<![cCBb])\/(?![Ss]))', ' ', strResult)
     return strResult
 
 def control_nospecchar(textInput):
@@ -66,11 +70,23 @@ def control_nospecchar(textInput):
 def control_nocommonwords(textInput):
     """
     """
+    
     stop_words = get_stop_words('english')
+    #textInput.encode('latin-1')
     words = control_lowercase(textInput)
-        
-    patterns = '|'.join(stop_words)
-    return re.sub(patterns,'', words)    
+    for e in stop_words:
+        words = re.sub('(\s+' + e + '\s)',' ', words)
+    return words
+#    stop_words = ['\s' + e + '\s' for e in stop_words]
+#    rep = len(stop_words)/100.0
+#    if len(stop_words)/100.0 > len(stop_words)/100:
+#        rep = len(stop_words)/100 + 1
+#    else:
+#        rep = len(stop_words)/100    
+#    for i =    
+#    patterns = '|'.join(stop_words)
+    #patterns.join()
+#    return re.sub(patterns,' ', words)    
 
 def control_noerrorwords(textInput,jdlist):
     """
@@ -80,29 +96,33 @@ def control_noerrorwords(textInput,jdlist):
     checker.set_text(textInput)
     for errorword in checker:
         words.append(errorword.word)
-        
-    crosswords = set(words).intersection(set(jdlist))
+    words = list(set(words))    
+    crosswords = set(words).difference(set(jdlist))
     count = len(crosswords)
+    cvtext = textInput
     if count == 0:
-        patterns = '|'.join(crosswords)
+        for e in words:
+            cvtext = re.sub('(\s+' + e + '\s)',' ', cvtext)
     else:
-        patterns = '|'.join(set(jdlist).difference(crosswords))
-    return re.sub(patterns,'', textInput)
+        for e in crosswords:
+            cvtext = re.sub('(\s+' + e + '\s)',' ', cvtext)
+    return cvtext
         
 def getstringlist(textInput):
     """
     """
     wordsarray = np.array(list(lib_str.split(textInput,' ')))
-    return list(wordsarray[wordsarray<>''])
-    
+    wordsarray = list(wordsarray[wordsarray<>''])
+    for e in wordsarray:
+        if len(e)==1: 
+            wordsarray.remove(e)
+    return wordsarray
 
 def datapurse_general(textInput):
     """
     """
     # html tag removing
     stringpurse = control_nohtmltags(textInput)
-    # number removing
-    stringpurse = control_nonumber(stringpurse)    
     # non-alpha character
     #stringpurse = replace_non_alphanumerics(stringpurse)
     # punctuation removing
@@ -111,15 +131,17 @@ def datapurse_general(textInput):
     stringpurse = control_nospecchar(stringpurse)
     stringpurse = control_lowercase(stringpurse)    
     # common words removing
-    #stringpurse = control_nocommonwords(stringpurse)    
+    stringpurse = control_nocommonwords(stringpurse)    
     # get list and return
+    # number removing
+    stringpurse = control_nonumber(stringpurse)    
+
     return stringpurse
  
 def datapurse_cv(cvtext, jdtext):
     """
     """
     cvwords = datapurse_general(cvtext)
-    #todo: change the logic of jdtext parsing for no need of multiple times
     jdlist = list(set(getstringlist(datapurse_general(jdtext))))
     return getstringlist(control_noerrorwords(cvwords,jdlist))        
     

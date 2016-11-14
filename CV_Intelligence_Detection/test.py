@@ -24,6 +24,8 @@ Created on Thu Nov 10 13:08:01 2016
 #for err in checker:
 #    print err.word
 # 
+
+
 import Utility_Input2Text as uit
 import Utility_TextClearance as utc
 
@@ -34,5 +36,16 @@ jdtext = uit.get_text('d:\\data\\jd.docx')
 #print cvtext
 
 #print cvtext
-cvlist = utc.datapurse_general(cvtext)
-print cvlist
+cvtext = utc.datapurse_general(cvtext)
+jdtext = utc.datapurse_general(jdtext)
+
+print 'cvtext: %s' %cvtext
+print 'jdtext: %s' %jdtext
+print ' '
+
+pursedlist = utc.datapurse_cv(cvtext, jdtext)
+
+print pursedlist
+
+
+

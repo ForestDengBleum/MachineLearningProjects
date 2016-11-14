@@ -29,7 +29,7 @@ def get_pdftext(fileName):
         pageObj = pdfReader.getPage(i)
         items.append(pageObj.extractText())
     pdfFile.close()
-    return ''.join(items)    
+    return ' '.join(items)    
 
 def get_wordtext(fileName):
     """
@@ -39,7 +39,7 @@ def get_wordtext(fileName):
     for para in doc.paragraphs:
         items.append(para.text)
     #doc.close()
-    return ''.join(items)
+    return ' '.join(items)
 
 def get_htmltext(fileName):
     """

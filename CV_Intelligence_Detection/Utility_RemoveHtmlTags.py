@@ -24,7 +24,7 @@ def filter_tags(htmlstr):
     s=re_style.sub(' ',s)
     s=re_br.sub('\n',s)
     s=re_h.sub(' ',s)
-    s=re_comment.sub('',s)
+    s=re_comment.sub(' ',s) 
     
     blank_line=re.compile('\n+')
     s=blank_line.sub('\n',s)
