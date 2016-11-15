@@ -63,9 +63,9 @@ def list_allfiles(dirName, patterns='*', single_level = False, yield_folders = F
     """
     """    
     patterns = patterns.split(';')
-    for path, subdirs, files in lib_os.walk(dirName):
+    for path, subDirs, files in lib_os.walk(dirName):
         if yield_folders:
-            files.extend(subdirs)
+            files.extend(subDirs)
         files.sort()
         for name in files:
             for pattern in patterns:

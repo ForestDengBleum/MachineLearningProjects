@@ -28,8 +28,8 @@ Created on Thu Nov 10 13:08:01 2016
 
 import Utility_Input2Text as uit
 import Utility_TextClearance as utc
-import Algrithm_CVJDSimilarity as ac
-import Algrithm_TFIDF as at
+#import Algrithm_CVJDSimilarity as ac
+import Algrithm_TFIDF_BAYES as at
 
 cvtext1 = uit.get_text('d:\\data\\cv2.mht')
 
@@ -53,18 +53,18 @@ pursedlist2, jdlist = utc.datapurse_cv(cvtext2, jdtext)
 
 pursedlist = [pursedlist1, pursedlist2]
 
-returnM = at.get_tfidfmatrics(pursedlist)
+returnM = at.get_combinedtfidfmatrics(pursedlist)
 
 print returnM
 #dic = ac.list_counter(pursedlist)
 
 
-cvframe = ac.get_dataframewithper(pursedlist)
-jdframe = ac.get_dataframewithper(jdlist)
+#cvframe = ac.get_dataframewithper(pursedlist)
+#jdframe = ac.get_dataframewithper(jdlist)
 
-similarity = ac.get_similarity(cvframe, jdframe)
+#similarity = ac.get_similarity(cvframe, jdframe)
 
-print similarity
+#print similarity
 
 #docs = ' '.join(jdlist)
 
