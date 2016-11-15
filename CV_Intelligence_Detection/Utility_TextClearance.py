@@ -4,8 +4,8 @@ Created on Thu Nov 10 14:56:21 2016
 
 @author: forest.deng
 """
-import re
-import numpy as np
+import re as lib_re
+import numpy as lib_np
 import string as lib_str
 #import stop_words as sw
 import Utility_RemoveHtmlTags as rht
@@ -20,13 +20,11 @@ def control_nounicode(textInput):
     """
     """
  #   return re.sub(r'[\u4e00-\u9fff]','?', textInput)
-    cp0 = re.compile(r'file:\/\/\/.|\n*NextPart')
-    s = cp0.match(textInput)
-    print s.group(0)
+    cp0 = lib_re.compile(r'application/vnd.ms-officetheme(.|\n)*NextPart.*')
     textInput = cp0.sub(' ',textInput)
-    cp1 = re.compile(r'[\W+]', re.UNICODE)
-    cp2 = re.compile(r'[\x81-\xff]')
-    return cp2.sub(' ',cp1.sub(' ', textInput))
+#    cp1 = re.compile(r'[\W+]', re.UNICODE)
+    cp2 = lib_re.compile(r'[\x81-\xff]')
+    return cp2.sub(' ', textInput)
 #    return textInput.encode('unicode','replace')        
     
 
@@ -56,7 +54,7 @@ def control_nohtmltags(textInput):
 def control_nonumber(textInput):
     """
     """
-    return re.sub(r'[\d+]',' ', textInput)
+    return lib_re.sub(r'[\d+]',' ', textInput)
 
 def control_nopunctuation(textInput):
     """
@@ -72,9 +70,9 @@ def control_nopunctuation(textInput):
     
     rep = ' '*len(filterStr)
     strResult = textInput.translate(lib_str.maketrans(filterStr,rep))
-    strResult = re.sub(r'\.(?!([nN][eE][tT]))',' ', strResult)
-    strResult = re.sub(r'(?<![cC])#',' ', strResult)
-    strResult = re.sub(r'(\/(?![Ss]))|((?<![cCBb])\/)|\
+    strResult = lib_re.sub(r'\.(?!([nN][eE][tT]))',' ', strResult)
+    strResult = lib_re.sub(r'(?<![cC])#',' ', strResult)
+    strResult = lib_re.sub(r'(\/(?![Ss]))|((?<![cCBb])\/)|\
                         ((?<![cCBb])\/(?![Ss]))', ' ', strResult)
     return strResult
 
@@ -91,9 +89,14 @@ def control_nocommonwords(textInput):
     
     stop_words = get_stop_words('english')
     #textInput.encode('latin-1')
+    mystop_wordsfile = open('Utility_MyStopWords.txt','r')
+    mystop_words = list(lib_str.split(lib_re.sub('\n',' ',  
+                        mystop_wordsfile.read()),' '))
+    mystop_wordsfile.close()
+    stop_words.extend(mystop_words)
     words = control_lowercase(textInput)
     for e in stop_words:
-        words = re.sub('(\s+' + e + '\s)',' ', words)
+        words = lib_re.sub('(\s+' + e + '\s)',' ', words)
     return words
 #    stop_words = ['\s' + e + '\s' for e in stop_words]
 #    rep = len(stop_words)/100.0
@@ -115,60 +118,62 @@ def control_noerrorwords(textInput,jdlist):
     for errorword in checker:
         words.append(errorword.word)
     words = list(set(words))
-    crosswords = set(words).difference(set(jdlist))
-    count = len(crosswords)
+    crossWords = set(words).difference(set(jdlist))
+    count = len(crossWords)
     cvtext = textInput
 
-    pwordsfile = open('Utility_Mywords.txt','r')
-    pwords = set(list(lib_str.split(re.sub('\n',' ', pwordsfile.read()),' ')))
-    pwordsfile.close()
+    pWordsFile = open('Utility_MyWords.txt','r')
+    pWords = set(list(lib_str.split(lib_re.sub('\n',' ', \
+                    pWordsFile.read()),' ')))
+    pWordsFile.close()
     
-    crosswords = crosswords.difference(pwords)
+    crossWords = crossWords.difference(pWords)
     
     if count == 0:
         for e in words:
-            cvtext = re.sub('(\s+' + e + '\s)',' ', cvtext)
+            cvtext = lib_re.sub('(\s+' + e + '\s)',' ', cvtext)
     else:
-        for e in crosswords:
-            cvtext = re.sub('(\s+' + e + '\s)',' ', cvtext)
+        for e in crossWords:
+            cvtext = lib_re.sub('(\s+' + e + '\s)',' ', cvtext)
     return cvtext
         
 def getstringlist(textInput):
     """
     """
-    wordsarray = np.array(list(lib_str.split(textInput,' ')))
-    wordsarray = list(wordsarray[wordsarray<>''])
-    for e in wordsarray:
+    wordsArray = lib_np.array(list(lib_str.split(textInput,' ')))
+    wordsArray = list(wordsArray[wordsArray<>''])
+    for e in wordsArray[:]:
         if len(e)==1: 
-            wordsarray.remove(e)
-    return wordsarray
+            wordsArray.remove(e)
+    return wordsArray
 
 def datapurse_general(textInput):
     """
     """
     # html tag removing
-    stringpurse = control_nohtmltags(textInput)
+    stringPurse = control_nohtmltags(textInput)
     # non-alpha character
-    stringpurse = control_nounicode(stringpurse)
+    stringPurse = control_nounicode(stringPurse)
     # punctuation removing
-    stringpurse = control_nopunctuation(stringpurse)
+    stringPurse = control_nopunctuation(stringPurse)
     # special char removing
-    stringpurse = control_nospecchar(stringpurse)
-    stringpurse = control_lowercase(stringpurse)    
+    stringPurse = control_nospecchar(stringPurse)
+    stringPurse = control_lowercase(stringPurse)    
     # common words removing
-    stringpurse = control_nocommonwords(stringpurse)    
+    stringPurse = control_nocommonwords(stringPurse)    
     # get list and return
     # number removing
-    stringpurse = control_nonumber(stringpurse)    
+    stringPurse = control_nonumber(stringPurse)    
 
-    return stringpurse
+    return stringPurse
  
 def datapurse_cv(cvtext, jdtext):
     """
     """
-    cvwords = datapurse_general(cvtext)
+    cvWords = datapurse_general(cvtext)
     jdlist = list(set(getstringlist(datapurse_general(jdtext))))
-    return getstringlist(control_noerrorwords(cvwords,jdlist)), getstringlist(jdtext)        
+    
+    return getstringlist(control_noerrorwords(cvWords,jdlist)), getstringlist(jdtext)        
     
 
    

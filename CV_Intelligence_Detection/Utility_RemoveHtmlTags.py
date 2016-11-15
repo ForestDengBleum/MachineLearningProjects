@@ -7,7 +7,7 @@ Created on Thu Nov 10 15:35:56 2016
 
 # -*- coding: utf-8-*-
 import re
-import Utility_TextClearance as utc
+#import Utility_TextClearance as utc
 
 def filter_tags(htmlstr):
     #先过滤CDATA
@@ -40,13 +40,12 @@ def replaceCharEntity(htmlstr):
     re_charEntity=re.compile(r'&#?(?P<name>\w+);')
     sz=re_charEntity.search(htmlstr)
     while sz:
-#        entity=sz.group()#entity全称，如&gt;
-        key=sz.group('name')#去除&;后entity,如&gt;为gt
+        key=sz.group('name')#remove &;gt;gt
         try:
             htmlstr=re_charEntity.sub(CHAR_ENTITIES[key],htmlstr,1)
             sz=re_charEntity.search(htmlstr)
         except KeyError:
-            #以空串代替
+            # space replace
             htmlstr=re_charEntity.sub('',htmlstr,1)
             sz=re_charEntity.search(htmlstr)
     return htmlstr

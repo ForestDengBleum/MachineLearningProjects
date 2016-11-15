@@ -6,7 +6,7 @@ Created on Mon Nov 14 08:44:16 2016
 """
 import pandas as lib_pd
 import math as lib_math
-import numpy as lib_np
+#import numpy as lib_np
 #from enchant.tokenize import get_tokenizer
 from collections import Counter
 from sklearn.feature_extraction.text import CountVectorizer
@@ -21,10 +21,16 @@ def text_tokenize(docs):
     return lib_pd.DataFrame(x1,cv.get_feature_names())
     
 
-def list_counter(inputlist):
+def list_counter(inputList):
     """
     """
-    return Counter(inputlist)
+    return Counter(inputList)
+    
+def dict_counter(inputList):
+    """
+    """
+    counts = list_counter(inputList)
+    return dict(counts)
     
 def get_dataframewithper(inputlist):
     """
