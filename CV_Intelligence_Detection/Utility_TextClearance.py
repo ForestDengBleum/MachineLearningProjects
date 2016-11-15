@@ -15,7 +15,19 @@ from enchant.checker import SpellChecker
 #def sigmoid(num):
 #    """"
 #    """"
-        
+
+def control_nounicode(textInput):
+    """
+    """
+ #   return re.sub(r'[\u4e00-\u9fff]','?', textInput)
+    cp0 = re.compile(r'file:\/\/\/.|\n*NextPart')
+    s = cp0.match(textInput)
+    print s.group(0)
+    textInput = cp0.sub(' ',textInput)
+    cp1 = re.compile(r'[\W+]', re.UNICODE)
+    cp2 = re.compile(r'[\x81-\xff]')
+    return cp2.sub(' ',cp1.sub(' ', textInput))
+#    return textInput.encode('unicode','replace')        
     
 
 def translate_non_alphanumerics(to_translate, translate_to='_'):
@@ -137,7 +149,7 @@ def datapurse_general(textInput):
     # html tag removing
     stringpurse = control_nohtmltags(textInput)
     # non-alpha character
-    #stringpurse = replace_non_alphanumerics(stringpurse)
+    stringpurse = control_nounicode(stringpurse)
     # punctuation removing
     stringpurse = control_nopunctuation(stringpurse)
     # special char removing

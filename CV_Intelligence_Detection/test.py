@@ -30,7 +30,7 @@ import Utility_Input2Text as uit
 import Utility_TextClearance as utc
 import Algrithm_CVJDSimilarity as ac
 
-cvtext = uit.get_text('d:\\data\\cv.docx')
+cvtext = uit.get_text('d:\\data\\cv2.mht')
 
 jdtext = uit.get_text('d:\\data\\jd.docx')
 

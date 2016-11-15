@@ -7,8 +7,6 @@ Created on Thu Nov 10 15:35:56 2016
 
 # -*- coding: utf-8-*-
 import re
-import string
-import numpy as np
 import Utility_TextClearance as utc
 
 def filter_tags(htmlstr):
@@ -56,10 +54,10 @@ def replaceCharEntity(htmlstr):
 def repalce(s,re_exp,repl_string):
     return re_exp.sub(repl_string,s)
 
-if __name__=='__main__':
-    s=file('D:\\new\\cc.html').read()
-    news=filter_tags(s)
-    print utc.control_nopunctuation(news)
+#if __name__=='__main__':
+#    s=file('D:\\new\\cc.html').read()
+#    news=filter_tags(s)
+#    print utc.control_nopunctuation(news)
 #    rep = ' '*len(string.punctuation)
 #    news = news.translate(string.maketrans(string.punctuation,rep))
 #    news = re.sub(r'[\d+]','', news)
