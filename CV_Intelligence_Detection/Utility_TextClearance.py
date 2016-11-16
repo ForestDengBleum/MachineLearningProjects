@@ -173,7 +173,23 @@ def datapurse_cv(cvtext, jdtext):
     cvWords = datapurse_general(cvtext)
     jdlist = list(set(getstringlist(datapurse_general(jdtext))))
     
-    return getstringlist(control_noerrorwords(cvWords,jdlist)), getstringlist(jdtext)        
+    return getstringlist(control_noerrorwords(cvWords,jdlist)), \
+                            getstringlist(datapurse_general(jdtext))        
+
+def getJDList(jdtext):
+    """
+    """
+    return getstringlist(datapurse_general(jdtext))    
     
+def datapurse_collection_cv(cvCollectionList, jdlist):
+    """
+    """
+    pursedlist = []
+    for cvtext in cvCollectionList:
+        cvWords = datapurse_general(cvtext)
+        pursedlist.append(getstringlist(control_noerrorwords
+                            (cvWords,list(set(jdlist)))))
+        
+    return pursedlist
 
    

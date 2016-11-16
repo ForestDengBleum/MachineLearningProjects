@@ -7,6 +7,10 @@ Created on Thu Nov 10 10:44:45 2016
 
 import PyPDF2 as lib_pdf
 import docx as lib_word
+
+import os
+import win32com.client
+
 import string as lib_str
 import os as lib_os
 import fnmatch as lib_fnmatch
@@ -41,6 +45,14 @@ def get_wordtext(fileName):
     #doc.close()
     return ' '.join(items)
 
+def get_wordtext2(fileName):
+    """
+    """
+    doc = win32com.client.GetObject(fileName)
+    return doc.Range().Text
+    #doc.close()
+
+
 def get_htmltext(fileName):
     """
     """
@@ -59,7 +71,8 @@ def get_text(fileName):
 # Get the file list from a specified folder
 #
 
-def list_allfiles(dirName, patterns='*', single_level = False, yield_folders = False):
+def list_allfiles(dirName, patterns='*', single_level = False, 
+                  yield_folders = False):
     """
     """    
     patterns = patterns.split(';')

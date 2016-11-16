@@ -31,9 +31,11 @@ import Utility_TextClearance as utc
 #import Algrithm_CVJDSimilarity as ac
 import Algrithm_TFIDF_BAYES as at
 
-cvtext1 = uit.get_text('d:\\data\\cv2.mht')
+testcv = uit.get_wordtext2('d:\\data\cv2.docx')
 
-cvtext2 = uit.get_text('d:\\data\\cv.docx')
+cvtext1 = uit.get_text('d:\\data\\cv.docx')
+
+cvtext2 = uit.get_text('d:\\data\HID-Kelly Zuo.docx')
 
 jdtext = uit.get_text('d:\\data\\jd.docx')
 
@@ -52,6 +54,9 @@ pursedlist1, jdlist = utc.datapurse_cv(cvtext1, jdtext)
 pursedlist2, jdlist = utc.datapurse_cv(cvtext2, jdtext)
 
 pursedlist = [pursedlist1, pursedlist2]
+
+returns = at.get_trained_bayesprobability(pursedlist)
+
 
 returnM = at.get_trained_tddf_feature(pursedlist)
 
@@ -74,4 +79,3 @@ print returnM
 #print pursedlist
 
 #print jdlist
-
