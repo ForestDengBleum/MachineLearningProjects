@@ -8,10 +8,13 @@ Created on Tue Nov 15 10:21:49 2016
 import Algrithm_CVJDSimilarity as ac
 import numpy as lib_np
 import pandas as lib_pd
+import math as lib_math
 
-# standard tfidf implementation instead of using CounterVetorize
+# tfidf implementation instead of using CounterVetorize
+# changed tfidf idf part for our train is based on JD and only the occurance
+# should be positive related with the similarity
 
-def get_tfidfmatrics(inputListCollection):
+def get_trained_tfidfmatrics(inputListCollection):
     """
     """
     allWords=[]
@@ -43,18 +46,19 @@ def get_tfidfmatrics(inputListCollection):
             else:
                 idf_wordscount.append(1)
                 tf.append(float(opDF[opDF.word==word].percentage))
-        idf.append(lib_np.log(float(totalLen)/sum(idf_wordscount))+0.5)
+#        idf.append(lib_np.log(float(totalLen)/sum(idf_wordscount))+0.5)
+        idf.append(sum(idf_wordscount)/float(totalLen))
         tf_idf = [e*float(idf[-1]) for e in tf]
         index = list(idfMatrix[idfMatrix.word==word].index)[0]
         for i in range(totalLen):
             idfMatrix.set_value(index,'cv'+str(i),tf_idf[i])        
         
-    return idfMatrix        
+    return idfMatrix.sort(['word'], ascending = 0)        
 
 # customize the tfidf in order to use more features. i.e. the matching degree
 # btween JD and CVs
     
-def get_combinedtfidfmatrics(inputListCollection):
+def get_trained_centroid_tfidfmatrics(inputListCollection):
     """
     """
     allWords=[]
@@ -90,9 +94,69 @@ def get_combinedtfidfmatrics(inputListCollection):
     idfMatrix['density'] = idfMatrix.frequency/sum(idfMatrix.frequency)
     idfMatrix['weights'] = idfMatrix.occurrence*idfMatrix.density    
             
-    return idfMatrix        
+    return idfMatrix.sort(['word'], ascending = 0)        
 
-def calculate_bayesprobability(tf_idf_cmatrix):
+# bayes probability
+# two training sets: passed and failed
+# for a new cv calculate the probability of passed and failed and 
+# decide its categry by the bigger one
+
+def calculate_bayesprobability(train_matrix, test_list,
+                               priority, c = 1e-6 ):
     """
     """
+    prob = 1.0
+    for word in test_list:
+        if len(train_matrix[train_matrix.word == word]) == 0:
+            prob *= c
+        else:
+            prob *= float(train_matrix.weights)
+    return prob * priority
+
+# try to get td df feature of trained docs for logic regress
+
+def get_trained_tddf_feature(inputListCollection):
+    """
+    """
+    tddf_matrix = get_trained_tfidfmatrics(inputListCollection)
+    centroid_matrix = get_trained_centroid_tfidfmatrics(inputListCollection)
+    distance = []
+    columnsList = list(tddf_matrix.columns)
+    columnsList.remove('word')
+    centroid_denominator = lib_math.sqrt(sum(centroid_matrix['weights']*
+                            centroid_matrix['weights']))
+    for col in columnsList:
+        numerator = sum(tddf_matrix[col]*centroid_matrix['weights'])
+        denominator = lib_math.sqrt(sum(tddf_matrix[col]*
+                            tddf_matrix[col]))*centroid_denominator         
+        distance.append(numerator/denominator)
+    return distance
+
+
+def get_test_tddf_feature(train_set, inputListCollection, c=1e-6):
+    """
+    """
+    inputlistLen = len(inputListCollection)
+    for i in range(inputlistLen):
+        dic = ac.dict_counter(inputListCollection[i])
+        
+
+
+#                        
+#    centroid_denominator =     
+#    for col in columnsList:
+#        temp_numerator = 0.0
+#        temp_denominator = 0.0        
+#        for word in centroid_matrix.word:
+#            if tddf_matrix[tddf_matrix.word == word][col] > 0.0:
+#                temp_numerator += float(tddf_matrix[tddf_matrix.word 
+#                                  == word][col]) * float(centroid_matrix[
+#                                  centroid_matrix.word == word]['weights'])
+#                temp_denominator += float(tddf_matrix[tddf_matrix.word 
+#                                == word][col]^2                   
+#        numerator.append(temp_numerator)
+#        temp_denominator = 
+                                  
+                  
+    
     

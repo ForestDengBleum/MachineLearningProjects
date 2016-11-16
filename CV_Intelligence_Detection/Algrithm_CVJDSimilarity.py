@@ -48,10 +48,13 @@ def get_dataframewithper(inputlist):
     #print df
     return df
     
+# get single cv similarity
     
-def get_similarity(cvframe, jdframe):
+def get_similarity(cvlist, jdlist):
     """
     """
+    cvframe = get_dataframewithper(cvlist)
+    jdframe = get_dataframewithper(jdlist)
     numerator = float(0)
     denominator = 0.0
     for cvrow in cvframe.iterrows():
@@ -63,4 +66,25 @@ def get_similarity(cvframe, jdframe):
                   lib_math.sqrt(sum(jdframe['percentage']*\
                                 jdframe['percentage']))
     return (numerator/denominator)
+    
+
+# get similarity for series of cvs
+
+def get_similarity(cvlist, jdlist):
+    """
+    """
+    cvframe = get_dataframewithper(cvlist)
+    jdframe = get_dataframewithper(jdlist)
+    numerator = float(0)
+    denominator = 0.0
+    for cvrow in cvframe.iterrows():
+        if len(jdframe[jdframe['word'] == cvrow[1][0]])==1:
+            numerator += float(cvrow[1][2]) * \
+                float(jdframe[jdframe['word'] == cvrow[1][0]]['percentage'])
+    denominator = lib_math.sqrt(sum(cvframe['percentage']*\
+                                cvframe['percentage'])) * \
+                  lib_math.sqrt(sum(jdframe['percentage']*\
+                                jdframe['percentage']))
+    return (numerator/denominator)
+
     

@@ -53,7 +53,7 @@ pursedlist2, jdlist = utc.datapurse_cv(cvtext2, jdtext)
 
 pursedlist = [pursedlist1, pursedlist2]
 
-returnM = at.get_combinedtfidfmatrics(pursedlist)
+returnM = at.get_trained_tddf_feature(pursedlist)
 
 print returnM
 #dic = ac.list_counter(pursedlist)
