@@ -23,7 +23,7 @@ def control_nounicode(textInput):
     cp0 = lib_re.compile(r'application/vnd.ms-officetheme(.|\n)*NextPart.*')
     textInput = cp0.sub(' ',textInput)
 #    cp1 = re.compile(r'[\W+]', re.UNICODE)
-    cp2 = lib_re.compile(r'[\x81-\xff]')
+    cp2 = lib_re.compile(r'([\x81-\xff]|\x07)')
     return cp2.sub(' ', textInput)
 #    return textInput.encode('unicode','replace')        
     

@@ -50,7 +50,7 @@ def get_trained_tfidfmatrics(inputListCollection, countLimit = 0):
             else:
                 idf_wordscount.append(1)
                 tf.append(float(opDF[opDF.word==word].percentage))
-                cnt += opDF.counts
+                cnt += float(opDF.counts)
 #        idf.append(lib_np.log(float(totalLen)/sum(idf_wordscount))+0.5)
         idf.append(sum(idf_wordscount)/float(totalLen))
         tf_idf = [e*float(idf[-1]) for e in tf]
@@ -163,7 +163,7 @@ def get_trained_tddf_similarity(inputListCollection):
         denominator = lib_math.sqrt(sum(tddf_matrix[col]*
                             tddf_matrix[col]))*centroid_denominator         
         distance.append(numerator/denominator)
-    return distance
+    return distance, centroid_matrix
 
 def get_trained_bayesprobability(inputListCollection):
     """
@@ -202,17 +202,18 @@ def get_test_tddf_similarity(train_centroid_matrix, inputListCollection,
                 weights.append(c*test_df[test_df.word == word]
                                     ['percentage'])                        
             else:
-                weights.append(train_centroid_matrix[train_centroid_matrix.word
-                == word]['occurrence'] * 
-                test_df[test_df.word == word]['percentage'])
+                weights.append(float(train_centroid_matrix
+                                    [train_centroid_matrix.word
+                                    == word]['occurrence']) * 
+                float(test_df[test_df.word == word]['percentage']))
         test_df['weights'] = weights
         numerator = 0.0        
         for word in test_df.word:
             if len(train_centroid_matrix[train_centroid_matrix.word 
                     == word]) == 0:
-                numerator += (train_centroid_matrix[train_centroid_matrix.word
-                            == word]['weights']*test_df[test_df.word == word]
-                            ['weights'])
+                numerator += (float(train_centroid_matrix[train_centroid_matrix.word
+                            == word]['weights'])*
+                            float(test_df[test_df.word == word]['weights']))
         test_denominator = lib_math.sqrt(sum(test_df.weights*test_df.weights))
         similarity.append(numerator/(train_denominator*test_denominator))
     return similarity                      

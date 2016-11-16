@@ -70,19 +70,20 @@ def get_similarity(cvlist, jdlist):
 
 # get similarity for series of cvs
 
-def get_collection_similarity(cvlist, jdlists):
+def get_collection_similarity(cvlists, jdlist):
     """
     """
     similarity = []
-    for jdlist in jdlists:
+    jdframe = get_dataframewithper(jdlist)
+    for cvlist in cvlists:
         cvframe = get_dataframewithper(cvlist)
-        jdframe = get_dataframewithper(jdlist)
         numerator = float(0)
         denominator = 0.0
         for cvrow in cvframe.iterrows():
             if len(jdframe[jdframe['word'] == cvrow[1][0]])==1:
                 numerator += float(cvrow[1][2]) * \
-                    float(jdframe[jdframe['word'] == cvrow[1][0]]['percentage'])
+                    float(jdframe[jdframe['word'] == 
+                            cvrow[1][0]]['percentage'])
         denominator = lib_math.sqrt(sum(cvframe['percentage']*\
                                     cvframe['percentage'])) * \
                       lib_math.sqrt(sum(jdframe['percentage']*\

@@ -8,11 +8,10 @@ Created on Thu Nov 10 10:44:45 2016
 import PyPDF2 as lib_pdf
 import docx as lib_word
 
-import os
+import os as lib_os
 import win32com.client
 
 import string as lib_str
-import os as lib_os
 import fnmatch as lib_fnmatch
 
 # read different format files
@@ -48,8 +47,18 @@ def get_wordtext(fileName):
 def get_wordtext2(fileName):
     """
     """
-    doc = win32com.client.GetObject(fileName)
-    return doc.Range().Text
+    wordapp = win32com.client.Dispatch('Word.Application')
+    doc = wordapp.Documents.Open(fileName)
+    txt = doc.Range().Text    
+    doc.Close()
+    wordapp.Quit()
+    
+    return txt
+        
+        
+    
+#   doc = win32com.client.GetObject(fileName)
+#    return doc.Range().Text
     #doc.close()
 
 
@@ -65,7 +74,7 @@ def get_text(fileName):
     """
     extName = lib_str.lower(lib_str.split(fileName,'.')[-1])
     if extName == 'pdf': return get_pdftext(fileName)
-    if extName in ['doc','docx']: return get_wordtext(fileName)
+    if extName in ['doc','docx']: return get_wordtext2(fileName)
     if extName in ['htm','html','mht']: return get_htmltext(fileName)
 
 # Get the file list from a specified folder
