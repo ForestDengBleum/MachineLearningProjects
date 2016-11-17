@@ -106,7 +106,7 @@ def get_listtext(dirName, patterns='*', single_level = False,
     fileList = list(list_allfiles(dirName,patterns,single_level,yield_folders))
     for sfile in fileList:
         items.append(get_text(sfile))
-        file_name.append(lib_str.split(sfile,'\\/')[-1])
+        file_name.append(lib_str.split(sfile,'\\')[-1])
     return items, file_name
         
     

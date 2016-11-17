@@ -67,11 +67,15 @@ def get_trained_tfidfmatrics(inputListCollection, countLimit = 0):
 # customize the tfidf in order to use more features. i.e. the matching degree
 # btween JD and CVs
     
-def get_trained_centroid_tfidfmatrics(inputListCollection, countLimit = 0):
+def get_trained_centroid_tfidfmatrics(inputListCollection, trained_y, 
+                                      countLimit = 0):
     """
     """
     allWords=[]
     DataFrameList = []
+    inputListCollection = lib_np.array(inputListCollection)
+    trained_y = lib_np.array(trained_y)
+    inputListCollection = list(inputListCollection[trained_y==1])
     totalLen = len(inputListCollection)
 
     for i in range(totalLen):
@@ -147,11 +151,12 @@ def calculate_collection_bayesprobability(train_matrix, test_listCollection,
 
 # try to get td df feature of trained docs for logic regress
 
-def get_trained_tddf_similarity(inputListCollection):
+def get_trained_tddf_similarity(inputListCollection, trained_y):
     """
     """
     tddf_matrix = get_trained_tfidfmatrics(inputListCollection)
-    centroid_matrix = get_trained_centroid_tfidfmatrics(inputListCollection)
+    centroid_matrix = get_trained_centroid_tfidfmatrics(inputListCollection, 
+                                                        trained_y)
     distance = []
     columnsList = list(tddf_matrix.columns)
     columnsList.remove('word')
@@ -159,7 +164,12 @@ def get_trained_tddf_similarity(inputListCollection):
     centroid_denominator = lib_math.sqrt(sum(centroid_matrix['weights']*
                             centroid_matrix['weights']))
     for col in columnsList:
-        numerator = sum(tddf_matrix[col]*centroid_matrix['weights'])
+        numerator = 0.0
+        for word in centroid_matrix.word:
+            if len(tddf_matrix[tddf_matrix.word == word]) != 0:
+                numerator += float(tddf_matrix[tddf_matrix.word == 
+                            word][col]) * float(centroid_matrix
+                            [centroid_matrix.word == word]['weights'])
         denominator = lib_math.sqrt(sum(tddf_matrix[col]*
                             tddf_matrix[col]))*centroid_denominator         
         distance.append(numerator/denominator)
@@ -199,8 +209,8 @@ def get_test_tddf_similarity(train_centroid_matrix, inputListCollection,
         for word in test_df.word:
             if len(train_centroid_matrix[train_centroid_matrix.word 
                     == word]) == 0:
-                weights.append(c*test_df[test_df.word == word]
-                                    ['percentage'])                        
+                weights.append(float(c*test_df[test_df.word == word]
+                                    ['percentage']))                        
             else:
                 weights.append(float(train_centroid_matrix
                                     [train_centroid_matrix.word
@@ -210,9 +220,9 @@ def get_test_tddf_similarity(train_centroid_matrix, inputListCollection,
         numerator = 0.0        
         for word in test_df.word:
             if len(train_centroid_matrix[train_centroid_matrix.word 
-                    == word]) == 0:
-                numerator += (float(train_centroid_matrix[train_centroid_matrix.word
-                            == word]['weights'])*
+                    == word]) != 0:
+                numerator += (float(train_centroid_matrix
+                            [train_centroid_matrix.word == word]['weights'])*
                             float(test_df[test_df.word == word]['weights']))
         test_denominator = lib_math.sqrt(sum(test_df.weights*test_df.weights))
         similarity.append(numerator/(train_denominator*test_denominator))

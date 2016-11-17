@@ -31,6 +31,10 @@ import Utility_TextClearance as utc
 #import Algrithm_CVJDSimilarity as ac
 import Algrithm_TFIDF_BAYES as at
 
+
+
+
+
 testcv = uit.get_wordtext2('d:\\data\\cv3.doc')
 
 cvtext1 = uit.get_text('d:\\data\\cv.docx')

@@ -91,4 +91,7 @@ def get_collection_similarity(cvlists, jdlist):
         similarity.append(numerator/denominator)
     return similarity
 
+def get_collection_jdtitle_match(jdtitle, cvlist):
+    """
+    """
     
