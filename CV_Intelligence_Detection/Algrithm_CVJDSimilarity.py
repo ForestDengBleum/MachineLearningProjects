@@ -90,4 +90,5 @@ def get_collection_similarity(cvlists, jdlist):
                                     jdframe['percentage']))
         similarity.append(numerator/denominator)
     return similarity
+
     

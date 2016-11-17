@@ -48,7 +48,7 @@ def get_wordtext2(fileName):
     """
     """
     wordapp = win32com.client.Dispatch('Word.Application')
-    doc = wordapp.Documents.Open(fileName)
+    doc = wordapp.Documents.Open(fileName,ConfirmConversions=False)
     txt = doc.Range().Text    
     doc.Close()
     wordapp.Quit()
@@ -97,14 +97,17 @@ def list_allfiles(dirName, patterns='*', single_level = False,
                 if single_level:
                     break 
 
-def get_listtext(dirName, patterns='*', single_level = False, yield_folders = False):
+def get_listtext(dirName, patterns='*', single_level = False, 
+                 yield_folders = False):
     """
     """
     items =[];
+    file_name = []
     fileList = list(list_allfiles(dirName,patterns,single_level,yield_folders))
     for sfile in fileList:
         items.append(get_text(sfile))
-    return items
+        file_name.append(lib_str.split(sfile,'\\/')[-1])
+    return items, file_name
         
     
         

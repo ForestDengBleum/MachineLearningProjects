@@ -50,7 +50,7 @@ def get_trained_tfidfmatrics(inputListCollection, countLimit = 0):
             else:
                 idf_wordscount.append(1)
                 tf.append(float(opDF[opDF.word==word].percentage))
-                cnt += float(opDF.counts)
+                cnt += float(opDF[opDF.word==word].counts)
 #        idf.append(lib_np.log(float(totalLen)/sum(idf_wordscount))+0.5)
         idf.append(sum(idf_wordscount)/float(totalLen))
         tf_idf = [e*float(idf[-1]) for e in tf]
