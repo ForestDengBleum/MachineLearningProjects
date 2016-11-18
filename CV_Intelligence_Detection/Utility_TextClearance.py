@@ -98,16 +98,7 @@ def control_nocommonwords(textInput):
     for e in stop_words:
         words = lib_re.sub('(\s+' + e + '\s)',' ', words)
     return words
-#    stop_words = ['\s' + e + '\s' for e in stop_words]
-#    rep = len(stop_words)/100.0
-#    if len(stop_words)/100.0 > len(stop_words)/100:
-#        rep = len(stop_words)/100 + 1
-#    else:
-#        rep = len(stop_words)/100    
-#    for i =    
-#    patterns = '|'.join(stop_words)
-    #patterns.join()
-#    return re.sub(patterns,' ', words)    
+ 
 
 def control_noerrorwords(textInput,jdlist):
     """

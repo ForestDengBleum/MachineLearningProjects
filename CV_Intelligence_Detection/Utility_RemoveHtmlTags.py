@@ -53,21 +53,3 @@ def replaceCharEntity(htmlstr):
 def repalce(s,re_exp,repl_string):
     return re_exp.sub(repl_string,s)
 
-#if __name__=='__main__':
-#    s=file('D:\\new\\cc.html').read()
-#    news=filter_tags(s)
-#    print utc.control_nopunctuation(news)
-#    rep = ' '*len(string.punctuation)
-#    news = news.translate(string.maketrans(string.punctuation,rep))
-#    news = re.sub(r'[\d+]','', news)
-#    print news
-#    excl = ''.join(['\n','\t','\r','\b','\v','\f'])
-#    repl = ''.join([' ',' ',' ',' ',' ',' '])
-#    news = re.sub(r'[\d+]',' ',re.sub(r'[^\w\s]',' ',news))
-#    print re.sub(r'^.{1,2}',' ',news)
-#    words = np.array(string.split(news.translate(string.maketrans(excl,repl)), ' '))
-#    words = words[words<>'']
-#    print re.sub(r'[a-zA-Z]{1,2}','',words)
-    
-    #    print string.split(re.sub(r'[\d+]',' ',re.sub(r'[^\w\s]',' ',news)),' ')
-    
