@@ -21,7 +21,7 @@ if __name__=='__main__':
     
 # Training data and get model
 
-    trainedRequired_netengineer = True
+    trainedRequired_netengineer = False
     role_name = '.Net Engineer'
     train_cvpath_netengineer = cv_path_temp.replace('rolename', role_name)
     train_jdpath_netengineer = jd_path_temp.replace('rolename', role_name)
@@ -37,7 +37,13 @@ if __name__=='__main__':
     plt.title('Train/Test data distribution for Role: ' + role_name )
     plt.xlabel('JD similarity')
     plt.ylabel('Centroid similarity')
-    plt.scatter(trained_X[:,0],trained_X[:,1], s = 40)
+    marker ='os'
+    color ='by'
+    for x in trained_X:
+        if model_netengineer.predict(x) == 1:
+            plt.scatter(x[0],x[1], s = 40)
+        else:
+            plt.scatter(x[0],x[1], s = 40, marker ='s', c='g')
 
     
 # get test data   
@@ -51,7 +57,7 @@ if __name__=='__main__':
                                        list(predict_netengineer))
     print 'Predict Probability: %s' % model_netengineer.predict_proba(test_X)
     
-    plt.scatter(test_X[:,0], test_X[:,1], marker='^', c='r', s = 40)
+    plt.scatter(test_X[:,0], test_X[:,1], marker='^', c='g', s = 40)
     
     
 # Group 2    
