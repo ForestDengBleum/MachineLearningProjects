@@ -192,4 +192,14 @@ def datapurse_collection_cv(cvCollectionList, jdlist):
         
     return pursedlist
 
+def getJDTitlelist(jdTitleText):
+    """
+    """
+    pursed_jdTitle = jdTitleText[:-len(lib_str.split(jdTitleText,'.')[-1])]  
+    pursed_jdTitle = datapurse_general(pursed_jdTitle)
+    pursed_jdTitle = lib_re.sub(r'jd\s',' ', pursed_jdTitle)
+    pursed_jdTitle = lib_re.sub(r'(i{1,3}\s)',' ', pursed_jdTitle)
+    pursed_jdTitle = lib_re.sub(r'(vi|iv)\s',' ', pursed_jdTitle)
+    return getstringlist(pursed_jdTitle)    
+    
    

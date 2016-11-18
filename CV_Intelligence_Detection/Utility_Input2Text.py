@@ -94,10 +94,10 @@ def list_allfiles(dirName, patterns='*', single_level = False,
                 if lib_fnmatch.fnmatch(name, pattern):
                     yield lib_os.path.join(path, name)
                     break
-                if single_level:
-                    break 
+        if single_level:
+            break 
 
-def get_listtext(dirName, patterns='*', single_level = False, 
+def get_listtext(dirName, patterns='*', single_level = True, 
                  yield_folders = False):
     """
     """

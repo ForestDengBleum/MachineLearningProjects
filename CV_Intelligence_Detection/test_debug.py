@@ -29,7 +29,7 @@ Created on Thu Nov 10 13:08:01 2016
 import Utility_Input2Text as uit
 import Utility_TextClearance as utc
 #import Algrithm_CVJDSimilarity as ac
-import Algrithm_TFIDF_BAYES as at
+import Algorithm_TFIDF_BAYES as at
 
 
 
