@@ -6,6 +6,7 @@ Created on Thu Nov 17 15:41:54 2016
 """
 import Train_Features as tf
 import matplotlib.pyplot as plt
+import numpy as lib_np
 
 
 if __name__=='__main__':
@@ -31,12 +32,23 @@ if __name__=='__main__':
                                         train_jdpath_netengineer,
                                         trainedRequired_netengineer)    
     print 'Use SVC to train and get the model: %s' %model_netengineer                                    
-    print 'SVC Model - coef_: %s' %model_netengineer.coef_
-    print 'SVC Model - Intercept_: %s' %model_netengineer.intercept_
+#    print 'SVC Model - coef_: %s' %model_netengineer.coef_
+#    print 'SVC Model - Intercept_: %s' %model_netengineer.intercept_
     plt.figure(fig)
-    plt.title('Train/Test data distribution for Role: ' + role_name )
+    plt.title('Train/Test data distribution for Role: ' + role_name 
+               + '\n' + 'Train Data: circle; '+ 'Test Date: triangle' )
     plt.xlabel('JD similarity')
     plt.ylabel('Centroid similarity')
+# decision boundary
+    x_min, x_max = trained_X[:, 0].min() - 0.03, trained_X[:, 1].max() + 0.03
+    y_min, y_max = trained_X[:, 1].min() - 0.03, trained_X[:, 1].max() + 0.03
+    xx, yy = lib_np.meshgrid(lib_np.arange(x_min, x_max, 0.01), 
+                             lib_np.arange(y_min, y_max, 0.01))
+    z_predict = model_netengineer.predict(zip(xx.ravel(), yy.ravel()))
+    z_predict = z_predict.reshape(xx.shape)
+    plt.contourf(xx, yy, z_predict, alpha = 0.3)
+#    plt.xlim(0,1)
+#    plt.ylim(0,1)
     marker ='o'
     color ='rb'
     for x in trained_X:

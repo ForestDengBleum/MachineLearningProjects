@@ -87,7 +87,7 @@ def get_trained_model_wrap(train_cv_path, train_jd_path,
     trained_Y = lib_cp.load(trained_Y_file)
     trained_X_file.close()
     trained_Y_file.close()
-    svc = svm.SVC(kernel = 'linear', probability = True)
+    svc = svm.SVC(kernel = 'rbf', probability = True, gamma = 10)
     model = svc.fit(trained_X, trained_Y)
     return model, trained_X, trained_Y   
 
