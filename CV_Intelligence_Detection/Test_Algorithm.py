@@ -37,13 +37,11 @@ if __name__=='__main__':
     plt.title('Train/Test data distribution for Role: ' + role_name )
     plt.xlabel('JD similarity')
     plt.ylabel('Centroid similarity')
-    marker ='os'
-    color ='by'
+    marker ='o'
+    color ='rb'
     for x in trained_X:
-        if model_netengineer.predict(x) == 1:
-            plt.scatter(x[0],x[1], s = 40)
-        else:
-            plt.scatter(x[0],x[1], s = 40, marker ='s', c='g')
+        plt.scatter(x[0],x[1], s = 40, marker = marker, c=color[
+                                model_netengineer.predict(x)])
 
     
 # get test data   
@@ -56,9 +54,12 @@ if __name__=='__main__':
     print 'Predict results: %s' %  zip(test_X_namelist, 
                                        list(predict_netengineer))
     print 'Predict Probability: %s' % model_netengineer.predict_proba(test_X)
-    
-    plt.scatter(test_X[:,0], test_X[:,1], marker='^', c='g', s = 40)
-    
+
+    tmarker = '^'
+    size = 60    
+    for x in test_X:    
+        plt.scatter(x[0], x[1], marker = tmarker, c=color[
+                            model_netengineer.predict(x)], s = size)
     
 # Group 2    
     fig += 1        
