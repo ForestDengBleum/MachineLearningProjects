@@ -31,7 +31,7 @@ def face_detect_returnloc(imagePath, cascPath = cascPath):
 
     return faces
 
-def face_detect_returnimg(imagePath, cascPath):
+def face_detect_returnimg(imagePath, cascPath = cascPath):
     """
     """
 # Create the haar cascade
@@ -53,27 +53,42 @@ def face_detect_returnimg(imagePath, cascPath):
     for (x, y, w, h) in faces:
         img.append(image[y:y+h, x:x+w, :])        
     
-    return img
+    return img, faces
 
 def face_detect_batch_returnimg(imageDir, cascPath = cascPath):
     """
     """
     fileList = list(list_allfiles(imageDir))
     nameList = [get_fileShortName(e) for e in fileList]
-#    faceCascade = lib_cv2.CascadeClassifier(cascPath)
+    faceCascade = lib_cv2.CascadeClassifier(cascPath)
+    img = []
+    faces_list = []                                    
+    for fl in fileList:
+        image = lib_cv2.imread(fl)
+        gray = lib_cv2.cvtColor(image, lib_cv2.COLOR_BGR2GRAY)
+
+        faces = faceCascade.detectMultiScale(
+                                    gray,
+                                    scaleFactor=1.25,
+                                    minNeighbors=2,
+                                    minSize=(30,30),
+                                    flags = lib_cv2.cv.CV_HAAR_SCALE_IMAGE
+                                            )
+        faces_list.append(faces)                                    
+        for (x, y, w, h) in faces:
+            img.append(image[y:y+h, x:x+w, :])        
+    
+    return img, nameList, faces_list
+
+
+def img_batch_read(imageDir, cascPath = cascPath):
+    """
+    """
+    fileList = list(list_allfiles(imageDir))
+    nameList = [get_fileShortName(e) for e in fileList]
     img = []                                    
     for fl in fileList:
         image = lib_cv2.imread(fl)
-#        gray = lib_cv2.cvtColor(image, lib_cv2.COLOR_BGR2GRAY)
-
-#        faces = faceCascade.detectMultiScale(
-#                                    gray,
-#                                    scaleFactor=1.25,
-#                                    minNeighbors=2,
-#                                    minSize=(30,30),
-#                                    flags = lib_cv2.cv.CV_HAAR_SCALE_IMAGE
-#                                            )
-#        for (x, y, w, h) in faces:
         img.append(image)        
     
     return img, nameList
@@ -142,4 +157,17 @@ def get_fileShortName(fileName):
             return fileName.split('/')[-1].split('.')[-2]        
     else:
         return fileName.split('\\')[-1].split('.')[-2]        
+
+
+def get_fileShortNamewithext(fileName):
+    """
+    """
+    if fileName.find('\\') < 0:
+        if fileName.find('/') < 0:
+            return fileName                
+        else:        
+            return fileName.split('/')[-1]        
+    else:
+        return fileName.split('\\')[-1]       
+
     

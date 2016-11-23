@@ -1,0 +1,26 @@
+cnumpy.core.multiarray
+_reconstruct
+p1
+(cnumpy
+ndarray
+p2
+(I0
+tS'b'
+tRp3
+(I1
+(I8
+tcnumpy
+dtype
+p4
+(S'S12'
+I0
+I1
+tRp5
+(I3
+S'|'
+NNNI12
+I1
+I0
+tbI00
+S'Anna Zhang\x00\x00Annie Li\x00\x00\x00\x00Annie Zheng\x00Frank Xie\x00\x00\x00Kelly Zuo\x00\x00\x00Michael YangRecca Li\x00\x00\x00\x00Yoyo Pan\x00\x00\x00\x00'
+tb.
