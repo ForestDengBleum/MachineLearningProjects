@@ -8,7 +8,7 @@ p2
 tS'b'
 tRp3
 (I1
-(I8
+(I16
 tcnumpy
 dtype
 p4
@@ -22,5 +22,5 @@ NNNI12
 I1
 I0
 tbI00
-S'Anna Zhang\x00\x00Annie Li\x00\x00\x00\x00Annie Zheng\x00Frank Xie\x00\x00\x00Kelly Zuo\x00\x00\x00Michael YangRecca Li\x00\x00\x00\x00Yoyo Pan\x00\x00\x00\x00'
+S'Annie Hist\x00\x00Barack ObamaBarack ObamaBarack ObamaBarack ObamaBarack ObamaBarack ObamaBarack ObamaBarack ObamaBarack ObamaBarack ObamaBarack ObamaBarack ObamaBarack ObamaBill ClintonTrump\x00\x00\x00\x00\x00\x00\x00'
 tb.
