@@ -26,9 +26,10 @@ kernal_fun = 'rbf'
 degree_kernal = 3
 gamma_s = 8
 
+similarity_limit = 0.7
 
 # neuro parameter
-layer_s1 = 10
+layer_s1 = 5
 layer_s2 = 5
 
 # euclidean distance parameter
@@ -50,6 +51,8 @@ mapping_pers_name_neuro = r'/mapping.txt'
 
 pers_folder = 'persistence'
 
+
+epoch_time = 2000
 
 # not found words
 word_notfound = 'Not Found'
@@ -264,7 +267,7 @@ def get_trained_Y_textvalue(
     """
     y_array = trained_Y[0]
     ymax_index = y_array.argmax(0)
-    if y_array[ymax_index] < 0.7:
+    if y_array[ymax_index] < similarity_limit:
         return word_notfound, y_array[ymax_index] 
     for m in mapping.keys():
         mmax_index = lib_np.array(mapping.get(m)).argmax(0)
@@ -296,7 +299,7 @@ def get_trained_model_data_neuro(
 #    net = lib_nl.net.newff(netminmax, [layer_s1, layer_s2, cat_no])
     net = lib_nl.net.newff(netminmax, [layer_s1, cat_no])
    
-    err = net.train(trained_X, trained_Y)        
+    err = net.train(trained_X, trained_Y, epochs = epoch_time)        
 
 # data persistence
 
@@ -500,22 +503,12 @@ def get_test_result_neuro(
             test_Y = model.sim(test_X)
             test_Y, similarity = get_trained_Y_textvalue(test_Y, mapping)
             returnY.append(test_Y)    
-            lib_cv2.rectangle(
-                                image, 
-                                (face[0], face[1]), 
-                                (face[0] + face[2], face[1] + face[3]), 
-                                (0, 255, 0), 
-                                2
-                                )
-            lib_cv2.putText(
-                            image, 
-                            test_Y, 
-                            (face[0] -3 , face[1] - 3), 
-                            font, 
-                            0.9,  
-                            (0, 0, 255), 
-                            1
-                            )
+            pic_retangle(image, face)
+
+            if image.shape[0] > 800:
+                pic_inputtext(image, face, test_Y, 4, 2)
+            else:
+                pic_inputtext(image, face, test_Y, 0.9, 1)
             result_list.append([test_Y,similarity])
             img_index += 1
             fn_list.append(fn)

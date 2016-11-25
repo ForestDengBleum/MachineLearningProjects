@@ -104,7 +104,7 @@ def face_saving(imagePath, faces, save_path = train_face_temp_folder):
         
     index = 0    
     for (x, y, w, h) in faces:
-        lib_cv2.imwrite(save_path + 'face_' + feature + '_'
+        lib_cv2.imwrite(save_path + feature + '__'
                         +  str(index) + '.jpg', image[y:y+h, x:x+w,:])
         index = index + 1
 

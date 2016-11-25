@@ -7,6 +7,6 @@ Created on Thu Nov 24 09:12:59 2016
 
 import Utility_FaceDetect as ufd
 
-train_folder = 'D:\\pic\\new'
+train_folder = 'D:\\Badge Photo'
 
 ufd.face_batch_saving(train_folder)
