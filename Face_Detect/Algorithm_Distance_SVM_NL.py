@@ -28,7 +28,7 @@ gamma_s = 8
 
 
 # neuro parameter
-layer_s1 = 20
+layer_s1 = 10
 layer_s2 = 5
 
 # euclidean distance parameter
@@ -46,6 +46,7 @@ model_pers_name_svc = r'/model_SVC.txt'
 trainedX_pers_name_neuro = r'/trained_X_neuro.txt'
 trainedY_pers_name_neuro = r'/trained_Y_neuro.txt'
 model_pers_name_neuro = r'/model_neuro.txt'
+mapping_pers_name_neuro = r'/mapping.txt'
 
 pers_folder = 'persistence'
 
@@ -54,6 +55,114 @@ pers_folder = 'persistence'
 word_notfound = 'Not Found'
 
 exts = ['.jpg', '.bmp', '.png', '.gif']
+
+
+def data_persistence_encode(
+                            model, 
+                            trained_X, 
+                            trained_Y,
+                            model_file, 
+                            trained_X_file, 
+                            trained_Y_file,
+                            trainDir, 
+                            persistence_folder = pers_folder
+                            ):
+    """
+    persist data
+    """
+    train_X_file = open(
+                        trainDir + 
+                        persistence_folder + 
+                        trained_X_file, 
+                        'w'
+                        )
+    train_Y_file = open(
+                        trainDir + 
+                        persistence_folder + 
+                        trained_Y_file, 
+                        'w'
+                        )
+    model_file = open(
+                        trainDir + 
+                        persistence_folder +
+                        model_file, 
+                        'w'
+                        )                    
+    lib_cp.dump(trained_X, train_X_file)
+    lib_cp.dump(trained_Y, train_Y_file)
+    lib_cp.dump(model, model_file)            
+    train_X_file.close()
+    train_Y_file.close()
+    model_file.close()
+
+def data_persistence_encode_neuromapping(
+                                    mapping,
+                                    mapping_pfile, 
+                                    trainDir, 
+                                    persistence_folder = pers_folder
+                                    ):
+    """
+    persist data
+    """
+    mapping_file = open(
+                        trainDir + 
+                        persistence_folder + 
+                        mapping_pfile, 
+                        'w'
+                        )
+    lib_cp.dump(mapping, mapping_file)
+    mapping_file.close()
+
+def data_persistence_decode_neuromapping(
+                                    mapping_pfile, 
+                                    trainDir, 
+                                    persistence_folder = pers_folder
+                                    ):
+    """
+    restore data
+    """
+    mapping_file = open(
+                        trainDir + 
+                        persistence_folder + 
+                        mapping_pfile
+                        )
+    mapping = lib_cp.load(mapping_file)
+    mapping_file.close()
+    return mapping
+
+def data_persistence_decode(
+                            model_file, 
+                            trained_X_file, 
+                            trained_Y_file, 
+                            trainDir, 
+                            persistence_folder = pers_folder
+                            ):
+    """
+    restore data
+    """
+    train_X_file = open(
+                        trainDir + 
+                        persistence_folder + 
+                        trained_X_file
+                        )
+    train_Y_file = open(
+                        trainDir + 
+                        persistence_folder + 
+                        trained_Y_file
+                        )
+    model_file = open(
+                        trainDir + 
+                        persistence_folder +
+                        model_file
+                        )                  
+    trained_X = lib_cp.load(train_X_file)
+    trained_Y = lib_cp.load(train_Y_file)
+    model = lib_cp.load(model_file)
+    train_X_file.close()
+    train_Y_file.close()
+    model_file.close()
+    return model, trained_X, trained_Y
+
 
 
 def get_euclideandistance(x, y):
@@ -162,76 +271,6 @@ def get_trained_Y_textvalue(
         if ymax_index == mmax_index:
             return m, y_array[ymax_index]
 
-def data_persistence_encode(
-                            model, 
-                            trained_X, 
-                            trained_Y,
-                            model_file, 
-                            trained_X_file, 
-                            trained_Y_file,
-                            trainDir, 
-                            persistence_folder = pers_folder
-                            ):
-    """
-    persist data
-    """
-    train_X_file = open(
-                        trainDir + 
-                        persistence_folder + 
-                        trained_X_file, 
-                        'w'
-                        )
-    train_Y_file = open(
-                        trainDir + 
-                        persistence_folder + 
-                        trained_Y_file, 
-                        'w'
-                        )
-    model_file = open(
-                        trainDir + 
-                        persistence_folder +
-                        model_file, 
-                        'w'
-                        )                    
-    lib_cp.dump(trained_X, train_X_file)
-    lib_cp.dump(trained_Y, train_Y_file)
-    lib_cp.dump(model, model_file)            
-    train_X_file.close()
-    train_Y_file.close()
-    model_file.close()
-
-def data_persistence_decode(
-                            model_file, 
-                            trained_X_file, 
-                            trained_Y_file, 
-                            trainDir, 
-                            persistence_folder = pers_folder
-                            ):
-    """
-    restore data
-    """
-    train_X_file = open(
-                        trainDir + 
-                        persistence_folder + 
-                        trained_X_file
-                        )
-    train_Y_file = open(
-                        trainDir + 
-                        persistence_folder + 
-                        trained_Y_file
-                        )
-    model_file = open(
-                        trainDir + 
-                        persistence_folder +
-                        model_file
-                        )                  
-    trained_X = lib_cp.load(train_X_file)
-    trained_Y = lib_cp.load(train_Y_file)
-    model = lib_cp.load(model_file)
-    train_X_file.close()
-    train_Y_file.close()
-    model_file.close()
-    return model, trained_X, trained_Y
         
 def get_trained_model_data_neuro(
                                     trainDir, 
@@ -243,6 +282,8 @@ def get_trained_model_data_neuro(
     
     trained_Y = [lib_str.split(e, '__')[-2] for e in nameList]
     trained_Y, mapping = get_trained_Y_neuromatrix(trained_Y)
+    
+    
     trained_X = get_pca_data(imgs)   
         
     trained_X = lib_np.array(trained_X)
@@ -267,6 +308,11 @@ def get_trained_model_data_neuro(
                             trainedY_pers_name_neuro,
                             trainDir
                             )
+    data_persistence_encode_neuromapping(
+                                        mapping,
+                                        mapping_pers_name_neuro,
+                                        trainDir
+                                        )
                             
     print 'trained error: {0} '.format(err)
     
@@ -282,38 +328,53 @@ def get_trained_model_data_wrap_neuro(trainDir, data_generated,
                                             persistence_folder
                                             )
     else:
-        return data_persistence_decode(
-                                        model_pers_name_neuro,
-                                        trainedX_pers_name_neuro,
-                                        trainedY_pers_name_neuro,                                        
-                                        trainDir, 
-                                        persistence_folder
-                                        )                
+        mapping = data_persistence_decode_neuromapping(
+                                                    mapping_pers_name_neuro,
+                                                    trainDir                                                                                                            
+                                                        )
+        model, trained_X, trained_Y = data_persistence_decode(
+                                                    model_pers_name_neuro,
+                                                    trainedX_pers_name_neuro,
+                                                    trainedY_pers_name_neuro,                                        
+                                                    trainDir, 
+                                                    persistence_folder
+                                                            )                
+        return model, mapping, trained_X, trained_Y                                                    
 
-
-
-def get_pca_data(imgs):
+def get_pca_data(
+                    imgs, 
+                    hight = resize_hight, 
+                    width = resize_width 
+                    ):
     """
     """
     reImg =[]
-    newsize = (resize_hight, resize_width)
+    newsize = (hight, width)
         
     pca = PCA(n_components = pca_components)
     
     for img in imgs:
         rimg = lib_cv2.resize(img, newsize)
         rimg = lib_cv2.cvtColor(rimg, lib_cv2.COLOR_BGR2GRAY)
+#        reImg.append(rimg.ravel().tolist())        
         reImg.append(pca.fit_transform(rimg).ravel().tolist())
 
     return reImg
 
-def get_pca_datum(img):
+def get_pca_datum(
+                    img, 
+                    hight = resize_hight, 
+                    width = resize_width 
+                    ):
     """
     """
     img_c = []
-    newsize = (resize_hight, resize_width)
+    newsize = (hight, width)
     rimg = lib_cv2.resize(img, newsize)
     rimg = lib_cv2.cvtColor(rimg, lib_cv2.COLOR_BGR2GRAY)
+    
+#    img_c.append(rimg.ravel().tolist())
+#    return img_c
 
     pca = PCA(n_components = pca_components)
     img_c.append(pca.fit_transform(rimg).ravel().tolist())     

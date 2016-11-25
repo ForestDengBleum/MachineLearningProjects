@@ -12,9 +12,10 @@ train_dir = r"./train_face/"
 
 if __name__=='__main__':
 
-# get model
-    train_required = True
 
+    train_required = False
+
+# Neuro
     (model, 
      mapping, 
      trained_X, 
@@ -34,7 +35,7 @@ if __name__=='__main__':
     
     print ''
 
-#SVC
+# SVC
 #    model, trained_X, trained_Y = ads.get_trained_model_data_wrap(
 #                                                        train_dir,
 #                                                        train_required
