@@ -51,10 +51,10 @@ def calcStats(na_normalized_price, lf_allocations):
 
     na_weighted_price = na_normalized_price * lf_allocations
 
-    na_portf_rets = na_weighted_price.sum(axis=1)
+    na_portf_value = na_weighted_price.sum(axis=1)
 
     # Calculate daily returns on portfolio
-#    na_portf_rets = na_portf_value.copy()
+    na_portf_rets = na_portf_value.copy()
     tsu.returnize0(na_portf_rets)
 
     # Calculate volatility (stdev) of daily returns of portfolio
@@ -69,20 +69,24 @@ def calcStats(na_normalized_price, lf_allocations):
 
     #Calculate cumulative daily return
     #...using recursive function
-    def cumret(t, lf_returns):
-        #base-case
-        if t==0:
-            return (1 + lf_returns[0]);
-        #continuation
-        return (cumret(t-1, lf_returns) * (1 + lf_returns[t]));
-
-    f_portf_cumrets = cumret(na_portf_rets.size - 1, na_portf_rets);
+        
+    f_portf_cumrets = np.cumprod(na_portf_rets + 1);
+    
+#    def cumret(t, lf_returns):
+#        #base-case
+#        if t==0:
+#            return (1 + lf_returns[0]);
+#        #continuation
+#        return (cumret(t-1, lf_returns) * (1 + lf_returns[t]));
+#
+#    f_portf_cumrets = cumret(na_portf_rets.size - 1, na_portf_rets);
 
     return [
             f_portf_volatility, 
             f_portf_avgret, 
             f_portf_sharpe, 
             f_portf_cumrets, 
+            na_portf_value
             ]
 
 '''
@@ -159,9 +163,7 @@ def optimize(ls_startDate, ls_endDate, ls_symbols, b_precision):
         #Define objective function (sharpe ratio)
         def objective_sharpe(x):
             return simulate(ls_startDate, ls_endDate, ls_symbols, x)[2];
-
         #Work on this later...
-        
     else:
         
         #Imprecise optimization (required in Homework 1)
@@ -221,7 +223,7 @@ def optimize(ls_startDate, ls_endDate, ls_symbols, b_precision):
 
         #Plot portfolio daily values over time period
         #Obtain benchmark $SPX data
-        d_spx = readData(li_startDate, li_endDate, ["$SPX"])[0];
+        d_spx = readData(ls_startDate, ls_endDate, ["$SPX"])[0];
         na_spxprice = d_spx['close'].values;
         na_spxnormalized_price = na_spxprice / na_spxprice[0,:];
         lf_spxStats = calcStats(na_spxnormalized_price, [1]);
@@ -236,8 +238,8 @@ def optimize(ls_startDate, ls_endDate, ls_symbols, b_precision):
         plt.savefig('chart.pdf', format='pdf');
 
         #Print results:
-        print "Start Date: ", li_startDate;
-        print "End Date: ", li_endDate;
+        print "Start Date: ", ls_startDate;
+        print "End Date: ", ls_endDate;
         print "Symbols: ", ls_symbols;
         print "Optimal Allocations: ", lf_CurrEffAllocation;
         print "Volatility (stdev daily returns): " , lf_CurrStats[0];
