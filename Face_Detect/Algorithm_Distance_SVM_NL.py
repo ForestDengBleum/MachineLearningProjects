@@ -19,18 +19,21 @@ resize_hight = 35
 resize_width = 35
 
 # pca component parameter to setup reduced dimensions
-pca_components = 5
+pca_components = 6
 
 # svm kernel function selection
 kernal_fun = 'rbf'
 degree_kernal = 3
 gamma_s = 8
 
-similarity_limit = 0.7
+similarity_limit = 0.75
 
 # neuro parameter
-layer_s1 = 5
-layer_s2 = 5
+
+# train_gdx with layer_s1 = 45
+
+layer_s1 = 120
+layer_s2 = 40
 
 # euclidean distance parameter
 eudistance = 1500
@@ -298,7 +301,8 @@ def get_trained_model_data_neuro(
 # create neuro network
 #    net = lib_nl.net.newff(netminmax, [layer_s1, layer_s2, cat_no])
     net = lib_nl.net.newff(netminmax, [layer_s1, cat_no])
-   
+    net.trainf = lib_nl.train.train_gdx
+    
     err = net.train(trained_X, trained_Y, epochs = epoch_time)        
 
 # data persistence
@@ -360,7 +364,8 @@ def get_pca_data(
         rimg = lib_cv2.resize(img, newsize)
         rimg = lib_cv2.cvtColor(rimg, lib_cv2.COLOR_BGR2GRAY)
 #        reImg.append(rimg.ravel().tolist())        
-        reImg.append(pca.fit_transform(rimg).ravel().tolist())
+        reImg.append(pca.fit_transform(rimg).T.ravel().tolist())
+        print pca.explained_variance_ratio_.cumsum()
 
     return reImg
 
@@ -380,7 +385,8 @@ def get_pca_datum(
 #    return img_c
 
     pca = PCA(n_components = pca_components)
-    img_c.append(pca.fit_transform(rimg).ravel().tolist())     
+    img_c.append(pca.fit_transform(rimg).T.ravel().tolist())   
+    print pca.explained_variance_ratio_.cumsum()
     return img_c    
 
 def pic_retangle(image, face):
@@ -447,19 +453,25 @@ def get_test_result(
             test_Y = model.predict(test_X)
             returnY.append(test_Y)    
 # test result by euclidean distance
-            reImg = centroids.get(test_Y[0])
+##            reImg = centroids.get(test_Y[0])
             pic_retangle(image, face)
             if len(test_Y) != 0:                        
-                dis = get_euclideandistance(test_X[0], reImg)
-                if dis < eudistance:
-                    pic_inputtext(image, face, test_Y[0], 0.9, 1)
-                    result_list.append(list(test_Y)[0])
+##                dis = get_euclideandistance(test_X[0], reImg)
+##                if dis < eudistance:
+                if image.shape[0] > 800:
+                    pic_inputtext(image, face, test_Y[0], 2, 2)
                 else:
-                    pic_inputtext(image, face, word_notfound, 0.9, 1)
-                    result_list.append(word_notfound)                
+                    pic_inputtext(image, face, test_Y[0], 0.9, 1)
+                result_list.append(list(test_Y)[0])
             else:
-                pic_inputtext(image, face, word_notfound, 0.9, 1)
+                if image.shape[0] > 800:
+                    pic_inputtext(image, face, word_notfound, 3, 2)
+                else:    
+                    pic_inputtext(image, face, word_notfound, 0.9, 1)
                 result_list.append(word_notfound)                
+##            else:
+##                pic_inputtext(image, face, word_notfound, 0.9, 1)
+##                result_list.append(word_notfound)                
             img_index += 1
             fn_list.append(fn)
             face_list.append(face)            
@@ -492,8 +504,6 @@ def get_test_result_neuro(
     for i in range(facelist_len):
         faces_len = len(facelist[i])
         image = lib_cv2.imread(fileList[i])
-        test_X = None
-        test_Y = None
         for j in range(faces_len):
             img = imgs[img_index]
             fn = nameList[i]
@@ -506,13 +516,16 @@ def get_test_result_neuro(
             pic_retangle(image, face)
 
             if image.shape[0] > 800:
-                pic_inputtext(image, face, test_Y, 4, 2)
+                pic_inputtext(image, face, test_Y, 2, 2)
             else:
                 pic_inputtext(image, face, test_Y, 0.9, 1)
             result_list.append([test_Y,similarity])
             img_index += 1
             fn_list.append(fn)
             face_list.append(face)            
+            test_X = None
+            test_Y = None
+            img = None
         lib_cv2.imwrite(
                         resultDir + 
                         ufd.get_fileShortNamewithext(fileList[i]), 

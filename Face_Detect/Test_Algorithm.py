@@ -13,7 +13,7 @@ train_dir = r"./train_face/"
 if __name__=='__main__':
 
 
-    train_required = False
+    train_required = True
 
 # Neuro
     (model, 
