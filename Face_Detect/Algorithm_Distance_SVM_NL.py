@@ -14,12 +14,15 @@ import cPickle as lib_cp
 import string as lib_str
 import neurolab as lib_nl
 
+from sklearn.grid_search import GridSearchCV
+
+
 # picture resize parameter 
-resize_hight = 35
-resize_width = 35
+resize_hight = 30
+resize_width = 30
 
 # pca component parameter to setup reduced dimensions
-pca_components = 6
+pca_components = 150
 
 # svm kernel function selection
 kernal_fun = 'rbf'
@@ -28,12 +31,15 @@ gamma_s = 8
 
 similarity_limit = 0.75
 
+confidence_limit = 500
+
 # neuro parameter
 
 # train_gdx with layer_s1 = 45
 
-layer_s1 = 120
-layer_s2 = 40
+layer_s1 = 300
+layer_s2 = 150
+layer_s3 = 40
 
 # euclidean distance parameter
 eudistance = 1500
@@ -50,12 +56,18 @@ model_pers_name_svc = r'/model_SVC.txt'
 trainedX_pers_name_neuro = r'/trained_X_neuro.txt'
 trainedY_pers_name_neuro = r'/trained_Y_neuro.txt'
 model_pers_name_neuro = r'/model_neuro.txt'
-mapping_pers_name_neuro = r'/mapping.txt'
+mapping_pers_name_neuro = r'/mapping_neuro.txt'
+
+trainedX_pers_name_cv = r'/trained_X_cv.txt'
+trainedY_pers_name_cv = r'/trained_Y_cv.txt'
+model_pers_name_cv = r'/model_cv.xml'
+mapping_pers_name_cv = r'/mapping_cv.txt'
+
 
 pers_folder = 'persistence'
 
 
-epoch_time = 2000
+epoch_time = 1000
 
 # not found words
 word_notfound = 'Not Found'
@@ -76,30 +88,34 @@ def data_persistence_encode(
     """
     persist data
     """
+    if model != None:
+        model_file = open(
+                    trainDir + 
+                    persistence_folder +
+                    model_file, 
+                    'w'
+                    )                 
+        lib_cp.dump(model, model_file)            
+        model_file.close()
+                            
     train_X_file = open(
                         trainDir + 
                         persistence_folder + 
                         trained_X_file, 
                         'w'
                         )
+
     train_Y_file = open(
                         trainDir + 
                         persistence_folder + 
                         trained_Y_file, 
                         'w'
                         )
-    model_file = open(
-                        trainDir + 
-                        persistence_folder +
-                        model_file, 
-                        'w'
-                        )                    
+   
     lib_cp.dump(trained_X, train_X_file)
     lib_cp.dump(trained_Y, train_Y_file)
-    lib_cp.dump(model, model_file)            
     train_X_file.close()
     train_Y_file.close()
-    model_file.close()
 
 def data_persistence_encode_neuromapping(
                                     mapping,
@@ -151,22 +167,30 @@ def data_persistence_decode(
                         persistence_folder + 
                         trained_X_file
                         )
+
     train_Y_file = open(
                         trainDir + 
                         persistence_folder + 
                         trained_Y_file
                         )
-    model_file = open(
-                        trainDir + 
-                        persistence_folder +
-                        model_file
-                        )                  
     trained_X = lib_cp.load(train_X_file)
     trained_Y = lib_cp.load(train_Y_file)
-    model = lib_cp.load(model_file)
     train_X_file.close()
     train_Y_file.close()
-    model_file.close()
+
+    try:
+        model_file = open(
+                            trainDir + 
+                            persistence_folder +
+                            model_file
+                            )                  
+                            
+        model = lib_cp.load(model_file)
+        model_file.close()
+    except:
+        model_file.close()
+        model = None
+
     return model, trained_X, trained_Y
 
 
@@ -197,13 +221,23 @@ def get_trained_model_data(
     trained_X = lib_np.array(trained_X)
     trained_Y = lib_np.array(trained_Y)
     
-    svc = svm.SVC(
-                    kernel = kernal_fun, 
-                    probability = True, 
-                    gamma = gamma_s
-                    )
+    param_grid = {'C': [1e3, 5e3, 1e4, 5e4, 1e5],
+         'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1], }
+ 
+    svc = GridSearchCV(svm.SVC(kernel='rbf', 
+                               class_weight='auto',
+                               probability = True), 
+                               param_grid)
+    #clf = clf.fit(X_train_pca, y_train)
+    
+    #svc = svm.SVC(
+    #                kernel = kernal_fun, 
+    #                probability = True, 
+    #                gamma = gamma_s
+    #                )
     
     model = svc.fit(trained_X, trained_Y)
+    print model.best_estimator_
 
 # data persistence
 
@@ -261,6 +295,22 @@ def get_trained_Y_neuromatrix(trained_Y):
     
     return y_conv, mapping    
 
+def get_trained_Y_cv(trained_Y):
+    """
+    """
+    y_set = set(trained_Y)
+    y_len = len(y_set)
+    y_set_code = range(y_len)
+
+    y_conv = []
+    mapping = dict(zip(y_set, y_set_code))
+    
+    for y in trained_Y:
+        y_conv.append(mapping.get(y))        
+    
+    return y_conv, mapping    
+
+
 # for neuro, convert Y back to text    
 def get_trained_Y_textvalue(
                             trained_Y, 
@@ -277,7 +327,69 @@ def get_trained_Y_textvalue(
         if ymax_index == mmax_index:
             return m, y_array[ymax_index]
 
+def get_trained_Y_cv_textvalue(
+                            trained_Y, 
+                            mapping
+                            ):
+    """
+    """
+    mapping_1 = dict(zip(mapping.values(),mapping.keys()))
+    
+    return mapping_1.get(trained_Y)     
+    
+
+    y_array = trained_Y[0]
+    ymax_index = y_array.argmax(0)
+    if y_array[ymax_index] < similarity_limit:
+        return word_notfound, y_array[ymax_index] 
+    for m in mapping.keys():
+        mmax_index = lib_np.array(mapping.get(m)).argmax(0)
+        if ymax_index == mmax_index:
+            return m, y_array[ymax_index]
+
+def get_trained_model_data_cv (    
+                                    trainDir, 
+                                    persistence_folder = pers_folder
+                              ):
+    """
+    """
+    imgs, nameList = ufd.img_batch_read(trainDir)
+    
+    trained_Y = [lib_str.split(e, '__')[-2] for e in nameList]
+    trained_Y, mapping = get_trained_Y_cv(trained_Y)
+    
+    
+    trained_X = get_img_data_cv(imgs)   
         
+    trained_X = lib_np.array(trained_X)
+    trained_Y = lib_np.array(trained_Y)
+    
+    model = lib_cv2.createEigenFaceRecognizer()
+    
+    model.train(trained_X, trained_Y)
+    
+    
+    model.save(trainDir + persistence_folder + model_pers_name_cv)
+    
+    data_persistence_encode(
+                            None, trained_X, 
+                            trained_Y,
+                            model_pers_name_cv, 
+                            trainedX_pers_name_cv,
+                            trainedY_pers_name_cv,
+                            trainDir
+                            )
+    data_persistence_encode_neuromapping(
+                                        mapping,
+                                        mapping_pers_name_cv,
+                                        trainDir
+                                        )
+    
+
+    return model, mapping, trained_X, trained_Y
+    
+ 
+       
 def get_trained_model_data_neuro(
                                     trainDir, 
                                     persistence_folder = pers_folder
@@ -300,10 +412,15 @@ def get_trained_model_data_neuro(
     
 # create neuro network
 #    net = lib_nl.net.newff(netminmax, [layer_s1, layer_s2, cat_no])
+#    net = lib_nl.net.newc(netminmax, cat_no)
     net = lib_nl.net.newff(netminmax, [layer_s1, cat_no])
+#    net = lib_nl.net.newelm(netminmax, [layer_s1, cat_no])
     net.trainf = lib_nl.train.train_gdx
+#    net.trainf = lib_nl.train.train_bfgs
     
-    err = net.train(trained_X, trained_Y, epochs = epoch_time)        
+    err = net.train(trained_X, trained_Y, epochs = epoch_time, lr = 10)        
+#    err = net.train(trained_Y)        
+
 
 # data persistence
 
@@ -348,6 +465,73 @@ def get_trained_model_data_wrap_neuro(trainDir, data_generated,
                                                             )                
         return model, mapping, trained_X, trained_Y                                                    
 
+
+def get_trained_model_data_wrap_cv(trainDir, data_generated, 
+                                persistence_folder = pers_folder):
+    """
+    """
+    if data_generated:
+        return get_trained_model_data_cv(
+                                            trainDir, 
+                                            persistence_folder
+                                            )
+    else:
+        mapping = data_persistence_decode_neuromapping(
+                                                    mapping_pers_name_cv,
+                                                    trainDir                                                                                                            
+                                                        )
+        model = lib_cv2.createEigenFaceRecognizer()
+        model.load(trainDir + persistence_folder + model_pers_name_cv)
+        model_none, trained_X, trained_Y = data_persistence_decode(
+                                                    model_pers_name_cv,
+                                                    trainedX_pers_name_cv,
+                                                    trainedY_pers_name_cv,                                        
+                                                    trainDir, 
+                                                    persistence_folder
+                                                            )                
+        return model, mapping, trained_X, trained_Y                                                    
+
+def get_img_data_cv(
+                    imgs, 
+                    hight = resize_hight, 
+                    width = resize_width 
+                    ):
+    """
+    """
+    reImg =[]
+    newsize = (hight, width)
+        
+#    pca = PCA(n_components = pca_components)
+    
+    for img in imgs:
+        rimg = lib_cv2.resize(img, newsize)
+        rimg = lib_cv2.cvtColor(rimg, lib_cv2.COLOR_BGR2GRAY)
+        reImg.append(rimg.ravel().tolist())        
+#        reImg.append(pca.fit_transform(rimg).T.ravel().tolist())
+        #print pca.explained_variance_ratio_.cumsum()
+
+    return reImg
+
+def get_img_datum_cv(
+                    img, 
+                    hight = resize_hight, 
+                    width = resize_width 
+                    ):
+    """
+    """
+    img_c = []
+    newsize = (hight, width)
+    rimg = lib_cv2.resize(img, newsize)
+    rimg = lib_cv2.cvtColor(rimg, lib_cv2.COLOR_BGR2GRAY)
+    
+    img_c.append(rimg.ravel().tolist())
+    return img_c
+
+#    pca = PCA(n_components = pca_components)
+#    img_c.append(pca.fit_transform(rimg).T.ravel().tolist())   
+    #print pca.explained_variance_ratio_.cumsum()
+#    return img_c    
+
 def get_pca_data(
                     imgs, 
                     hight = resize_hight, 
@@ -363,9 +547,9 @@ def get_pca_data(
     for img in imgs:
         rimg = lib_cv2.resize(img, newsize)
         rimg = lib_cv2.cvtColor(rimg, lib_cv2.COLOR_BGR2GRAY)
-#        reImg.append(rimg.ravel().tolist())        
-        reImg.append(pca.fit_transform(rimg).T.ravel().tolist())
-        print pca.explained_variance_ratio_.cumsum()
+        reImg.append(pca.fit_transform(rimg.ravel()).tolist())        
+#        reImg.append(pca.fit_transform(rimg).T.ravel().tolist())
+        #print pca.explained_variance_ratio_.cumsum()
 
     return reImg
 
@@ -385,8 +569,10 @@ def get_pca_datum(
 #    return img_c
 
     pca = PCA(n_components = pca_components)
-    img_c.append(pca.fit_transform(rimg).T.ravel().tolist())   
-    print pca.explained_variance_ratio_.cumsum()
+    img_c.append(pca.fit_transform(rimg.ravel()).tolist())        
+
+#    img_c.append(pca.fit_transform(rimg).T.ravel().tolist())   
+    #print pca.explained_variance_ratio_.cumsum()
     return img_c    
 
 def pic_retangle(image, face):
@@ -459,7 +645,7 @@ def get_test_result(
 ##                dis = get_euclideandistance(test_X[0], reImg)
 ##                if dis < eudistance:
                 if image.shape[0] > 800:
-                    pic_inputtext(image, face, test_Y[0], 2, 2)
+                    pic_inputtext(image, face, test_Y[0], 1.5, 1)
                 else:
                     pic_inputtext(image, face, test_Y[0], 0.9, 1)
                 result_list.append(list(test_Y)[0])
@@ -520,6 +706,59 @@ def get_test_result_neuro(
             else:
                 pic_inputtext(image, face, test_Y, 0.9, 1)
             result_list.append([test_Y,similarity])
+            img_index += 1
+            fn_list.append(fn)
+            face_list.append(face)            
+            test_X = None
+            test_Y = None
+            img = None
+        lib_cv2.imwrite(
+                        resultDir + 
+                        ufd.get_fileShortNamewithext(fileList[i]), 
+                        image
+                        )
+    return zip(fn_list, face_list, result_list), returnX, returnY    
+
+def get_test_result_cv(
+                            testDir, 
+                            model, 
+                            mapping, 
+                            resultDir = test_result_folder
+                            ):
+    """
+    """
+    fileList = list(ufd.list_allfiles(testDir))    
+    imgs, nameList, facelist = ufd.face_detect_batch_returnimg(testDir)
+    
+    img_index = 0
+    facelist_len = len(facelist)
+    fn_list = []
+    face_list = []
+    result_list = []
+    returnX = []
+    returnY = []
+    
+    for i in range(facelist_len):
+        faces_len = len(facelist[i])
+        image = lib_cv2.imread(fileList[i])
+        for j in range(faces_len):
+            img = imgs[img_index]
+            fn = nameList[i]
+            face = facelist[i][j]
+            test_X = lib_np.array(get_img_datum_cv(img))
+            returnX.append(test_X)
+            test_Y, confidence = model.predict(test_X)
+            if confidence <= confidence_limit:
+                test_Y = get_trained_Y_cv_textvalue(test_Y, mapping)
+            else:
+                test_Y = word_notfound
+            returnY.append(test_Y)    
+            pic_retangle(image, face)
+            if image.shape[0] > 800:
+                pic_inputtext(image, face, test_Y, 1.3, 2)
+            else:
+                pic_inputtext(image, face, test_Y, 0.9, 1)
+            result_list.append([test_Y,confidence])
             img_index += 1
             fn_list.append(fn)
             face_list.append(face)            
