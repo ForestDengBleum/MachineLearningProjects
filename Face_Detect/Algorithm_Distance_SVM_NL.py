@@ -8,13 +8,15 @@ Created on Tue Nov 22 10:24:23 2016
 import numpy as lib_np
 import Utility_FaceDetect as ufd
 import cv2 as lib_cv2
-from sklearn.decomposition import PCA
+#from sklearn.decomposition import PCA
 from sklearn import svm
 import cPickle as lib_cp
 import string as lib_str
 import neurolab as lib_nl
 
 from sklearn.grid_search import GridSearchCV
+from sklearn.decomposition import RandomizedPCA
+
 
 
 # picture resize parameter 
@@ -22,8 +24,7 @@ resize_hight = 30
 resize_width = 30
 
 # pca component parameter to setup reduced dimensions
-pca_components = 150
-
+pca_components = 8
 # svm kernel function selection
 kernal_fun = 'rbf'
 degree_kernal = 3
@@ -216,13 +217,13 @@ def get_trained_model_data(
     imgs, nameList = ufd.img_batch_read(trainDir)
     
     trained_Y = [lib_str.split(e, '__')[-2] for e in nameList]
-    trained_X = get_pca_data(imgs)   
-        
+#    trained_X = get_pca_data(imgs)   
+    trained_X = get_pca_data(imgs)            
     trained_X = lib_np.array(trained_X)
     trained_Y = lib_np.array(trained_Y)
     
-    param_grid = {'C': [1e3, 5e3, 1e4, 5e4, 1e5],
-         'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1], }
+    param_grid = {'C': [5e3, 1e4, 5e4, 1e5],
+         'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1, 1], }
  
     svc = GridSearchCV(svm.SVC(kernel='rbf', 
                                class_weight='auto',
@@ -542,16 +543,35 @@ def get_pca_data(
     reImg =[]
     newsize = (hight, width)
         
-    pca = PCA(n_components = pca_components)
+    pca = RandomizedPCA(n_components = pca_components, whiten = True)
     
     for img in imgs:
         rimg = lib_cv2.resize(img, newsize)
         rimg = lib_cv2.cvtColor(rimg, lib_cv2.COLOR_BGR2GRAY)
-        reImg.append(pca.fit_transform(rimg.ravel()).tolist())        
-#        reImg.append(pca.fit_transform(rimg).T.ravel().tolist())
-        #print pca.explained_variance_ratio_.cumsum()
+#        reImg.append(pca.fit_transform(rimg.ravel()).tolist())        
+        reImg.append(pca.fit_transform(rimg).T.ravel().tolist())
+        print pca.explained_variance_ratio_.cumsum()
 
     return reImg
+
+def get_pca_data_batch(
+                    imgs, 
+                    hight = resize_hight, 
+                    width = resize_width 
+                    ):
+    """
+    """
+    newsize = (hight, width)
+
+    rImgs = [lib_cv2.resize(e, newsize) for e in imgs]
+    rImgs = [lib_cv2.cvtColor(e, lib_cv2.COLOR_BGR2GRAY) for e in rImgs]
+    rImgs = [e.ravel() for e in rImgs]
+        
+    pca = RandomizedPCA(n_components = 200, whiten = True)
+    
+    pImgs = pca.fit_transform(rImgs)    
+    
+    return pImgs
 
 def get_pca_datum(
                     img, 
@@ -568,10 +588,10 @@ def get_pca_datum(
 #    img_c.append(rimg.ravel().tolist())
 #    return img_c
 
-    pca = PCA(n_components = pca_components)
-    img_c.append(pca.fit_transform(rimg.ravel()).tolist())        
+    pca = RandomizedPCA(n_components = pca_components, whiten = True)
+#    img_c.append(pca.fit_transform(rimg.ravel()).tolist())        
 
-#    img_c.append(pca.fit_transform(rimg).T.ravel().tolist())   
+    img_c.append(pca.fit_transform(rimg).T.ravel().tolist())   
     #print pca.explained_variance_ratio_.cumsum()
     return img_c    
 
@@ -637,27 +657,32 @@ def get_test_result(
             test_X = lib_np.array(get_pca_datum(img))
             returnX.append(test_X)
             test_Y = model.predict(test_X)
+            similarity = model.predict_proba(test_X)[0]
+#            index = dict(zip(model.best_estimator_.classes_, similarity[0]))
+            results_by_probability = map(
+                       lambda x: (x[0],x[1]), 
+                       sorted(zip(model.best_estimator_.classes_, similarity), 
+                       key=lambda x: x[1], reverse=True))
+            #similarity = model.score(test_X, test_Y)
+            #print similarity
             returnY.append(test_Y)    
-# test result by euclidean distance
-##            reImg = centroids.get(test_Y[0])
             pic_retangle(image, face)
-            if len(test_Y) != 0:                        
-##                dis = get_euclideandistance(test_X[0], reImg)
-##                if dis < eudistance:
-                if image.shape[0] > 800:
-                    pic_inputtext(image, face, test_Y[0], 1.5, 1)
-                else:
-                    pic_inputtext(image, face, test_Y[0], 0.9, 1)
-                result_list.append(list(test_Y)[0])
+            if results_by_probability[0][1] >= 0.1:
+                words = test_Y[0]
             else:
-                if image.shape[0] > 800:
-                    pic_inputtext(image, face, word_notfound, 3, 2)
-                else:    
-                    pic_inputtext(image, face, word_notfound, 0.9, 1)
-                result_list.append(word_notfound)                
-##            else:
-##                pic_inputtext(image, face, word_notfound, 0.9, 1)
-##                result_list.append(word_notfound)                
+                words = word_notfound
+
+            if image.shape[0] > 800:
+                pic_inputtext(image, face, words, 1.5, 1)
+            else:
+                pic_inputtext(image, face, words, 0.9, 1)
+            result_list.append((list(test_Y)[0], results_by_probability))
+            #else:
+            #    if image.shape[0] > 800:
+            #        pic_inputtext(image, face, word_notfound, 3, 2)
+            #    else:    
+            #        pic_inputtext(image, face, word_notfound, 0.9, 1)
+            #    result_list.append(word_notfound)                
             img_index += 1
             fn_list.append(fn)
             face_list.append(face)            

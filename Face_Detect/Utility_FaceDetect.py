@@ -88,6 +88,7 @@ def img_batch_read(imageDir, cascPath = cascPath):
     nameList = [get_fileShortName(e) for e in fileList]
     img = []                                    
     for fl in fileList:
+#        image = lib_cv2.imread(fl, lib_cv2.IMREAD_GRAYSCALE)
         image = lib_cv2.imread(fl)
         img.append(image)        
     
