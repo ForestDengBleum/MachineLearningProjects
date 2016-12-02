@@ -14,7 +14,13 @@ import datetime as dt
 '''
 ' Reads data from Yahoo Finance
 '''
-def readData(ls_startDate, ls_endDate, ls_symbols):
+def readData(
+                ls_startDate, 
+                ls_endDate, 
+                ls_symbols, 
+                ls_keys = ['open', 'high', 'low', 
+                           'close', 'volume', 'actual_close']
+                           ):
 
     dt_start = dt.datetime(ls_startDate[0], ls_startDate[1], ls_startDate[2]);
     dt_end = dt.datetime(ls_endDate[0], ls_endDate[1], ls_endDate[2]);
@@ -25,7 +31,7 @@ def readData(ls_startDate, ls_endDate, ls_symbols):
 
     c_dataobj = da.DataAccess('Yahoo');
 
-    ls_keys = ['open', 'high', 'low', 'close', 'volume', 'actual_close'];
+    #ls_keys = ['open', 'high', 'low', 'close', 'volume', 'actual_close'];
 
     ldf_data = c_dataobj.get_data(ldt_timestamps, ls_symbols, ls_keys);
     d_data = dict(zip(ls_keys, ldf_data));
