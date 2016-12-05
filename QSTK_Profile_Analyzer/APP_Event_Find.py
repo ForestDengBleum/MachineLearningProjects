@@ -75,12 +75,12 @@ if __name__ == '__main__':
       
     d_data = ufl.readData(startDate, endDate, ls_symbols)[0]
 
-    ls_keys = ['open', 'high', 'low', 'close', 'volume', 'actual_close']
-
-    for s_key in ls_keys:
-        d_data[s_key] = d_data[s_key].fillna(method='ffill')
-        d_data[s_key] = d_data[s_key].fillna(method='bfill')
-        d_data[s_key] = d_data[s_key].fillna(1.0)
+#    ls_keys = ['open', 'high', 'low', 'close', 'volume', 'actual_close']
+#
+#    for s_key in ls_keys:
+#        d_data[s_key] = d_data[s_key].fillna(method='ffill')
+#        d_data[s_key] = d_data[s_key].fillna(method='bfill')
+#        d_data[s_key] = d_data[s_key].fillna(1.0)
         
     dt_feature = ''.join([str(e) for e in startDate]) + '_' + \
                 ''.join([str(e) for e in endDate])    
