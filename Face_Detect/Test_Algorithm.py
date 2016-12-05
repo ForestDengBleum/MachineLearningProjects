@@ -16,22 +16,22 @@ if __name__=='__main__':
     train_required = True
 
 # CV
-#    (model, 
-#     mapping, 
-#     trained_X, 
-#     trained_Y
-#             ) = ads.get_trained_model_data_wrap_cv(
-#                                                     train_dir,
-#                                                     train_required
-#                                                     )
-#    test_dir = 'D:\\pic\\test'
-#
-#    (results, test_X, test_Y) = ads.get_test_result_cv(
-#                                                        test_dir, 
-#                                                        model,
-#                                                        mapping)
-#
-#    print ''
+    (model, 
+     mapping, 
+     trained_X, 
+     trained_Y
+             ) = ads.get_trained_model_data_wrap_cv(
+                                                     train_dir,
+                                                     train_required
+                                                     )
+    test_dir = 'D:\\pic\\test'
+
+    (results, test_X, test_Y) = ads.get_test_result_cv(
+                                                        test_dir, 
+                                                        model,
+                                                        mapping)
+
+    print ''
 
 
 # Neuro
@@ -55,12 +55,12 @@ if __name__=='__main__':
 #    print ''
 
 # SVC
-    model, trained_X, trained_Y = ads.get_trained_model_data_wrap(
-                                                        train_dir,
-                                                        train_required
-                                                            )
-    centroids = ads.get_category_centroid(trained_X, trained_Y)                                                        
-    test_dir = 'D:\\pic\\test'
-    
-    results, test_X, test_Y = ads.get_test_result(test_dir, model, centroids)
+#    model, trained_X, trained_Y = ads.get_trained_model_data_wrap(
+#                                                        train_dir,
+#                                                        train_required
+#                                                            )
+#    centroids = ads.get_category_centroid(trained_X, trained_Y)                                                        
+#    test_dir = 'D:\\pic\\test'
+#    
+#    results, test_X, test_Y = ads.get_test_result(test_dir, model, centroids)
 #    
