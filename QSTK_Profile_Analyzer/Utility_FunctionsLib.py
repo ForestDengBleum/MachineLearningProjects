@@ -49,4 +49,15 @@ def readData(
 
 
     return [d_data, dt_start, dt_end, dt_timeofday, ldt_timestamps]
+    
+def fetchNYSEData(dt_start, dt_end, ls_symbols):
+	
+    d_data_list = readData(dt_start, dt_end, ls_symbols) 
+    d_data = d_data_list[0]
+
+#    timestampsForNYSEDays = d_data['close'].index
+    na_price = d_data['close'].values
+	
+    return na_price, d_data_list[4]
+
         

@@ -69,16 +69,7 @@ def readOrdersFileIntoDF(filename):
 	# Returning it.
 	return sortedOrdersDataFrame, symbolList
 	
-def fetchNYSEData(dt_start, dt_end, ls_symbols):
-	
-    d_data_list = ufl.readData(dt_start, dt_end, ls_symbols) 
-    d_data = d_data_list[0]
-
-#    timestampsForNYSEDays = d_data['close'].index
-    na_price = d_data['close'].values
-	
-    return na_price, d_data_list[4]
-    
+   
 def marketsim(initialCash, ordersDataFrame, symbols, dt_end_ex = None):
 		
 	# reading the boundary dates
@@ -91,7 +82,9 @@ def marketsim(initialCash, ordersDataFrame, symbols, dt_end_ex = None):
         else:
             dt_end = dt_end_ex        
 
-    closingPrices, ldt_timestamps = fetchNYSEData(dt_start, dt_end, symbols)
+    closingPrices, ldt_timestamps = ufl.fetchNYSEData(dt_start, 
+                                                      dt_end, 
+                                                      symbols)
 	
     num_tradingDays = len(ldt_timestamps)
 	
@@ -173,7 +166,7 @@ def analyze(valueFrame):
     dt_start = valueFrame.index[0]
     dt_end = valueFrame.index[len(valueFrame) - 1]
         
-    spxClosingPrices, ldt_timestamps = fetchNYSEData(
+    spxClosingPrices, ldt_timestamps = ufl.fetchNYSEData(
                                                     dt_start, 
                                                     dt_end, 
                                                     symbols
