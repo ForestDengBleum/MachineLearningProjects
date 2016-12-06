@@ -82,7 +82,7 @@ def marketsim(initialCash, ordersDataFrame, symbols, dt_end_ex = None):
         else:
             dt_end = dt_end_ex        
 
-    closingPrices, ldt_timestamps = ufl.fetchNYSEData(dt_start, 
+    closingPrices, ldt_timestamps, _ = ufl.fetchNYSEData(dt_start, 
                                                       dt_end, 
                                                       symbols)
 	
@@ -166,7 +166,7 @@ def analyze(valueFrame):
     dt_start = valueFrame.index[0]
     dt_end = valueFrame.index[len(valueFrame) - 1]
         
-    spxClosingPrices, ldt_timestamps = ufl.fetchNYSEData(
+    spxClosingPrices, ldt_timestamps, _ = ufl.fetchNYSEData(
                                                     dt_start, 
                                                     dt_end, 
                                                     symbols

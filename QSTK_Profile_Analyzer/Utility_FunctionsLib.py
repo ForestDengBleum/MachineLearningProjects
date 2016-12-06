@@ -58,6 +58,6 @@ def fetchNYSEData(dt_start, dt_end, ls_symbols):
 #    timestampsForNYSEDays = d_data['close'].index
     na_price = d_data['close'].values
 	
-    return na_price, d_data_list[4]
+    return na_price, d_data_list[4], d_data
 
         
